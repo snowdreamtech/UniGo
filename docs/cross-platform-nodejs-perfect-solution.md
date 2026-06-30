@@ -2,9 +2,9 @@
 
 ## 核心发现
 
-**重要更正**: 经过实际测试验证，unirtm 的 Node.js core backend **不会**自动检测 musl 并下载预编译包。
+**重要更正**: 经过实际测试验证，unigo 的 Node.js core backend **不会**自动检测 musl 并下载预编译包。
 
-### unirtm 在不同平台的实际行为
+### unigo 在不同平台的实际行为
 
 | 平台 | 默认行为 | 是否需要配置 |
 |------|---------|-------------|
@@ -28,10 +28,10 @@ $ unirtm install node@25.9.0
 
 ### 方案 A: 条件环境变量（推荐）
 
-在 `.unirtm.toml` 中使用条件配置，根据系统自动选择：
+在 `.unigo.toml` 中使用条件配置，根据系统自动选择：
 
 ```toml
-# .unirtm.toml
+# .unigo.toml
 [tools]
 node = "25.9.0"
 python = "3.14.3"
@@ -60,16 +60,16 @@ FROM alpine:3.22
 # 安装基础依赖
 RUN apk add --no-cache bash curl git ca-certificates gpg
 
-# 安装 unirtm
-RUN curl https://unirtm.run | sh
+# 安装 unigo
+RUN curl https://unigo.run | sh
 ENV PATH="/root/.local/bin:$PATH"
 
-# ⭐ 关键：配置 unirtm 使用 musl 预编译包
+# ⭐ 关键：配置 unigo 使用 musl 预编译包
 ENV UNIRTM_NODE_MIRROR_URL="https://unofficial-builds.nodejs.org/download/release/"
 ENV UNIRTM_NODE_FLAVOR="musl"
 
 # 复制配置并安装
-COPY .unirtm.toml .
+COPY .unigo.toml .
 RUN unirtm install
 
 WORKDIR /app
@@ -80,7 +80,7 @@ CMD ["node", "index.js"]
 **优势**:
 
 - ✅ 配置清晰明确
-- ✅ 不影响 .unirtm.toml
+- ✅ 不影响 .unigo.toml
 - ✅ 适合单一平台部署
 
 ### 方案 C: 使用官方 Node.js Alpine 镜像（最简单）
@@ -88,13 +88,13 @@ CMD ["node", "index.js"]
 ```dockerfile
 FROM node:25.9.0-alpine3.22
 
-# 安装 unirtm 用于其他工具
+# 安装 unigo 用于其他工具
 RUN apk add --no-cache bash curl git
-RUN curl https://unirtm.run | sh
+RUN curl https://unigo.run | sh
 ENV PATH="/root/.local/bin:$PATH"
 
-# 复制配置（node 已预装，unirtm 跳过）
-COPY .unirtm.toml .
+# 复制配置（node 已预装，unigo 跳过）
+COPY .unigo.toml .
 RUN unirtm install python go
 
 WORKDIR /app
@@ -115,7 +115,7 @@ CMD ["node", "index.js"]
 ```dockerfile
 # 最小依赖 - 足以使用预编译包
 RUN apk add --no-cache \
-    bash \           # unirtm 需要
+    bash \           # unigo 需要
     curl \           # 下载工具
     git \            # 版本控制
     ca-certificates \# HTTPS
@@ -149,7 +149,7 @@ UNIRTM_DEBUG=1 unirtm install node@25.9.0
 ### 验证二进制文件类型
 
 ```bash
-file $(unirtm which node)
+file $(unigo which node)
 
 # Alpine (musl): dynamically linked, interpreter /lib/ld-musl-x86_64.so.1
 # Ubuntu (glibc): dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2
@@ -162,13 +162,13 @@ file $(unirtm which node)
 
 ```
 .
-├── .unirtm.toml              # 跨平台配置
+├── .unigo.toml              # 跨平台配置
 ├── Dockerfile.alpine       # Alpine 专用
 ├── Dockerfile.ubuntu       # Ubuntu 专用
 └── docker-compose.yml
 ```
 
-### .unirtm.toml（方案 A）
+### .unigo.toml（方案 A）
 
 ```toml
 [tools]
@@ -193,8 +193,8 @@ FROM alpine:3.22
 # 安装基础依赖
 RUN apk add --no-cache bash curl git ca-certificates gpg
 
-# 安装 unirtm
-RUN curl https://unirtm.run | sh
+# 安装 unigo
+RUN curl https://unigo.run | sh
 ENV PATH="/root/.local/bin:$PATH"
 
 # 配置 musl 预编译包
@@ -202,7 +202,7 @@ ENV UNIRTM_NODE_MIRROR_URL="https://unofficial-builds.nodejs.org/download/releas
 ENV UNIRTM_NODE_FLAVOR="musl"
 
 # 安装工具
-COPY .unirtm.toml .
+COPY .unigo.toml .
 RUN unirtm install
 
 WORKDIR /app
@@ -220,12 +220,12 @@ RUN apt-get update && apt-get install -y \
     bash curl git ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# 安装 unirtm
-RUN curl https://unirtm.run | sh
+# 安装 unigo
+RUN curl https://unigo.run | sh
 ENV PATH="/root/.local/bin:$PATH"
 
 # 安装工具（自动使用 glibc 预编译包）
-COPY .unirtm.toml .
+COPY .unigo.toml .
 RUN unirtm install
 
 WORKDIR /app
@@ -265,9 +265,9 @@ services:
 
 ## 常见问题
 
-### Q1: 为什么 unirtm 不自动检测 musl？
+### Q1: 为什么 unigo 不自动检测 musl？
 
-unirtm 的 Node.js core backend 默认使用 nodejs.org 官方源，而官方源只提供 glibc 预编译包。musl 预编译包来自社区维护的 unofficial-builds，需要手动配置。
+unigo 的 Node.js core backend 默认使用 nodejs.org 官方源，而官方源只提供 glibc 预编译包。musl 预编译包来自社区维护的 unofficial-builds，需要手动配置。
 
 ### Q2: 如何确认使用的是预编译包？
 
@@ -291,7 +291,7 @@ time unirtm install node@25.9.0
 # 安装编译依赖
 apk add python3 build-base linux-headers
 
-# 不设置 UNIRTM_NODE_FLAVOR，让 unirtm 从源码编译
+# 不设置 UNIRTM_NODE_FLAVOR，让 unigo 从源码编译
 unset UNIRTM_NODE_FLAVOR
 unirtm install node@25.9.0
 ```
@@ -306,7 +306,7 @@ unirtm install node@25.9.0
 
 ## 参考资源
 
-- [unirtm 官方文档](https://github.com/snowdreamtech/UniRTM)
+- [unigo 官方文档](https://github.com/snowdreamtech/UniGo)
 - [Node.js 官方下载](https://nodejs.org/dist/)
 - [Node.js Unofficial Builds](https://unofficial-builds.nodejs.org/)
 - [Alpine Linux 包搜索](https://pkgs.alpinelinux.org/)

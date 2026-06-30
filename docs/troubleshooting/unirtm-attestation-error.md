@@ -1,18 +1,18 @@
-# UniRTM Attestation Verification Error
+# UniGo Attestation Verification Error
 
 ## 问题描述
 
 在运行 `make sync-lock` 或 `unirtm install` 时，可能会遇到以下错误：
 
 ```
-unirtm ERROR github:astral-sh/ruff@0.15.10 has no provenance verification on linux-x64-musl,
+unigo ERROR github:astral-sh/ruff@0.15.10 has no provenance verification on linux-x64-musl,
 but github:astral-sh/ruff@0.15.9 had github-attestations. This could indicate a supply chain attack.
 Verify the release is authentic before proceeding.
 ```
 
 ## 根本原因
 
-这个错误是由于 unirtm 使用 **Aqua Registry** 作为后端来安装工具，而不是直接从 GitHub 下载。
+这个错误是由于 unigo 使用 **Aqua Registry** 作为后端来安装工具，而不是直接从 GitHub 下载。
 
 ### 🚨 为什么必须禁止 Aqua Registry？
 
@@ -22,9 +22,9 @@ Verify the release is authentic before proceeding.
    - 这使得无法验证二进制文件的真实来源和完整性
 
 2. **误报供应链攻击**
-   - unirtm 检测到新版本（如 0.15.10）没有 attestations
+   - unigo 检测到新版本（如 0.15.10）没有 attestations
    - 但旧版本（如 0.15.9）有 attestations
-   - unirtm 会误报为潜在的供应链攻击
+   - unigo 会误报为潜在的供应链攻击
    - 实际上这是 Aqua Registry 的问题，不是真正的攻击
 
 3. **官方维护者确认**
@@ -32,28 +32,28 @@ Verify the release is authentic before proceeding.
    - Aqua Registry 的重新打包导致 provenance 丢失
    - 这不是 Ruff 的问题，而是 Aqua 的设计缺陷
 
-4. **unirtm 的默认行为**
-   - 当你在 `.unirtm.toml` 中写 `github:astral-sh/ruff` 时
-   - unirtm 实际上使用 `aqua:astral-sh/ruff` 作为后端
+4. **unigo 的默认行为**
+   - 当你在 `.unigo.toml` 中写 `github:astral-sh/ruff` 时
+   - unigo 实际上使用 `aqua:astral-sh/ruff` 作为后端
    - metadata 查询来自 GitHub API
    - 但二进制下载来自 Aqua Registry（默认优先）
    - 这就是"明明写 github:，却不是从 GitHub 下载"的根本原因
 
 ### 技术细节
 
-1. **UniRTM 的后端机制**
-   - 当你在 `.unirtm.toml` 中指定 `github:astral-sh/ruff` 时
-   - unirtm 实际上使用 `aqua:astral-sh/ruff` 作为后端
-   - 可以在 <https://unirtm-versions.jdx.dev/tools/ruff> 查看
+1. **UniGo 的后端机制**
+   - 当你在 `.unigo.toml` 中指定 `github:astral-sh/ruff` 时
+   - unigo 实际上使用 `aqua:astral-sh/ruff` 作为后端
+   - 可以在 <https://unigo-versions.jdx.dev/tools/ruff> 查看
 
 2. **Aqua Registry 配置**
    - Aqua Registry 在 `pkgs/astral-sh/ruff/registry.yaml` 中配置了 `github_artifact_attestations`
    - 配置要求验证 GitHub Artifact Attestations（来源证明）
 
 3. **验证失败的原因**
-   - unirtm 在某些平台（如 linux-x64-musl, linux-arm64, macos-x64 等）上无法找到或验证 attestations
+   - unigo 在某些平台（如 linux-x64-musl, linux-arm64, macos-x64 等）上无法找到或验证 attestations
    - 这可能是由于：
-     - unirtm 的 attestation 验证逻辑有 bug
+     - unigo 的 attestation 验证逻辑有 bug
      - GitHub API 返回的 attestation 数据格式变化
      - 网络问题导致无法下载 attestation 文件
      - Aqua Registry 的配置与实际 release 不匹配
@@ -61,22 +61,22 @@ Verify the release is authentic before proceeding.
 4. **实际情况**
    - 经过验证，ruff 0.15.9 和 0.15.10 **都有** GitHub Artifact Attestations
    - 可以通过 `gh attestation verify` 命令验证
-   - 这不是真正的供应链攻击，而是 unirtm 的误报
+   - 这不是真正的供应链攻击，而是 unigo 的误报
 
 ## 解决方案
 
 ### 🛡️ 方案 1: 三层防御 - 完全禁止 Aqua Registry（强烈推荐）
 
-这是最彻底的解决方案，确保 unirtm 永远只从 GitHub Releases 下载二进制文件。
+这是最彻底的解决方案，确保 unigo 永远只从 GitHub Releases 下载二进制文件。
 
-#### 第一层：unirtm 配置文件
+#### 第一层：unigo 配置文件
 
-在 `.unirtm.toml` 的 `[settings]` 部分添加：
+在 `.unigo.toml` 的 `[settings]` 部分添加：
 
 ```toml
 [settings]
 # 🛡️ Supply Chain Security: Disable Aqua Registry Backend
-# CRITICAL: Force unirtm to download binaries ONLY from GitHub Releases,
+# CRITICAL: Force unigo to download binaries ONLY from GitHub Releases,
 # not from Aqua Registry which may repackage binaries and lose provenance.
 aqua.baked_registry = false
 aqua.github_attestations = false
@@ -87,7 +87,7 @@ aqua.minisign = false
 
 #### 第二层：环境变量强制
 
-在 `.unirtm.toml` 的 `[env]` 部分添加：
+在 `.unigo.toml` 的 `[env]` 部分添加：
 
 ```toml
 [env]
@@ -116,7 +116,7 @@ env:
 
 ```bash
 # 1. 检查 aqua 设置是否已禁用
-unirtm settings ls | grep aqua
+unigo settings ls | grep aqua
 
 # 应该看到：
 # aqua.baked_registry       false
@@ -167,17 +167,17 @@ unirtm install github:astral-sh/ruff@0.15.10 --yes
 如果 attestation 验证持续失败，可以暂时使用 0.15.9：
 
 ```toml
-# .unirtm.toml
+# .unigo.toml
 [tools]
 "github:astral-sh/ruff" = "0.15.9"
 ```
 
 ### 方案 5: 切换到其他安装方式
 
-使用 pipx 或 cargo 安装 ruff，而不是通过 unirtm：
+使用 pipx 或 cargo 安装 ruff，而不是通过 unigo：
 
 ```toml
-# .unirtm.toml
+# .unigo.toml
 [tools]
 # 使用 pipx 安装（Python 包）
 "pipx:ruff" = "0.15.10"
@@ -188,14 +188,14 @@ unirtm install github:astral-sh/ruff@0.15.10 --yes
 
 ## 验证步骤
 
-### 1. 检查 unirtm 使用的后端
+### 1. 检查 unigo 使用的后端
 
 ```bash
-# 查看 unirtm 版本信息
-unirtm --version
+# 查看 unigo 版本信息
+unigo --version
 
 # 查看工具的后端信息
-unirtm ls --json | jq '.[] | select(.name == "ruff")'
+unigo ls --json | jq '.[] | select(.name == "ruff")'
 ```
 
 ### 2. 手动验证 GitHub Attestations
@@ -219,51 +219,51 @@ gh attestation verify <downloaded-file> --repo astral-sh/ruff
 
 ### 1. 锁定版本
 
-在 `unirtm.lock` 中锁定已验证的版本：
+在 `unigo.lock` 中锁定已验证的版本：
 
 ```bash
 # 生成或更新 lockfile
 unirtm install
-unirtm lock
+unigo lock
 ```
 
 ### 2. 使用 CI 缓存
 
-在 CI 中缓存 unirtm 安装的工具，避免每次都重新验证：
+在 CI 中缓存 unigo 安装的工具，避免每次都重新验证：
 
 ```yaml
 # .github/workflows/ci.yml
 - uses: actions/cache@v4
   with:
-    path: ~/.local/share/unirtm
-    key: unirtm-${{ runner.os }}-${{ hashFiles('unirtm.lock') }}
+    path: ~/.local/share/unigo
+    key: unigo-${{ runner.os }}-${{ hashFiles('unigo.lock') }}
 ```
 
-### 3. 监控 unirtm 更新
+### 3. 监控 unigo 更新
 
-关注 unirtm 的更新日志，查看 attestation 验证相关的修复：
+关注 unigo 的更新日志，查看 attestation 验证相关的修复：
 
-- <https://github.com/jdx/unirtm/releases>
-- <https://github.com/jdx/unirtm/issues>
+- <https://github.com/jdx/unigo/releases>
+- <https://github.com/jdx/unigo/issues>
 
 ## 相关链接
 
-- [UniRTM 配置最佳实践](../reference/unirtm-configuration.md) - unirtm 配置标准和安全要求
+- [UniGo 配置最佳实践](../reference/unigo-configuration.md) - unigo 配置标准和安全要求
 - [GitHub Artifact Attestations 文档](https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations/using-artifact-attestations-to-establish-provenance-for-builds)
 - [Aqua Registry](https://github.com/aquaproj/aqua-registry)
-- [UniRTM 文档](https://github.com/snowdreamtech/UniRTM)
+- [UniGo 文档](https://github.com/snowdreamtech/UniGo)
 - [Ruff Releases](https://github.com/astral-sh/ruff/releases)
 
 ## 报告问题
 
-如果你认为这是 unirtm 的 bug，可以在以下位置报告：
+如果你认为这是 unigo 的 bug，可以在以下位置报告：
 
-1. **UniRTM 项目**: <https://github.com/jdx/unirtm/issues>
+1. **UniGo 项目**: <https://github.com/jdx/unigo/issues>
 2. **Aqua Registry**: <https://github.com/aquaproj/aqua-registry/issues>
 
 报告时请包含：
 
-- unirtm 版本 (`unirtm --version`)
+- unigo 版本 (`unigo --version`)
 - 操作系统和架构
 - 完整的错误信息
 - `UNIRTM_VERBOSE=1` 的详细日志

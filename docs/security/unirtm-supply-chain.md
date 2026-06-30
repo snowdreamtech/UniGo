@@ -1,14 +1,14 @@
-# unirtm Supply Chain Security Analysis
+# unigo Supply Chain Security Analysis
 
 ## Overview
 
-This document analyzes the supply chain risks associated with unirtm's default registry and provides mitigation strategies.
+This document analyzes the supply chain risks associated with unigo's default registry and provides mitigation strategies.
 
 ## Risk Analysis
 
 ### 1. Implicit Registry Redirection
 
-**Risk**: unirtm's built-in registry can silently redirect tool installations to different backends.
+**Risk**: unigo's built-in registry can silently redirect tool installations to different backends.
 
 **Example**:
 
@@ -16,7 +16,7 @@ This document analyzes the supply chain risks associated with unirtm's default r
 # You specify:
 "github:checkmake/checkmake" = "v0.3.2"
 
-# But unirtm's registry maps 'checkmake' to:
+# But unigo's registry maps 'checkmake' to:
 aqua:mrtazz/checkmake
 ```
 
@@ -24,11 +24,11 @@ aqua:mrtazz/checkmake
 
 - Different maintainer (`mrtazz` vs `checkmake` organization)
 - Additional layer (aqua registry) increases attack surface
-- Potential for supply chain attacks if registry is comprounirtmd
+- Potential for supply chain attacks if registry is comprounigod
 
 ### 2. Affected Tools in This Project
 
-Based on unirtm registry inspection, the following tools have registry mappings:
+Based on unigo registry inspection, the following tools have registry mappings:
 
 ```bash
 checkmake                     aqua:mrtazz/checkmake
@@ -40,7 +40,7 @@ hadolint                      aqua:hadolint/hadolint
 
 ### ✅ Already Implemented
 
-1. **Explicit Backend Specification**: All tools in `.unirtm.toml` use explicit backends:
+1. **Explicit Backend Specification**: All tools in `.unigo.toml` use explicit backends:
    - `github:owner/repo` for GitHub releases
    - `npm:package` for npm packages
    - `pipx:package` for Python packages
@@ -54,13 +54,13 @@ hadolint                      aqua:hadolint/hadolint
      ;;
    ```
 
-3. **Version Pinning**: All tools are pinned to specific versions in `.unirtm.toml`
+3. **Version Pinning**: All tools are pinned to specific versions in `.unigo.toml`
 
 ### 🔒 Additional Recommendations
 
-#### 1. Disable unirtm Registry (Future)
+#### 1. Disable unigo Registry (Future)
 
-When unirtm supports it, consider disabling the default registry:
+When unigo supports it, consider disabling the default registry:
 
 ```toml
 [settings]
@@ -72,29 +72,29 @@ disable_default_registry = true  # Not yet supported
 Regularly verify that installed tools match expected sources:
 
 ```bash
-# Check what unirtm actually installed
-unirtm list
+# Check what unigo actually installed
+unigo list
 
 # Verify binary checksums against official releases
 unirtm exec -- <tool> --version
 ```
 
-#### 3. Use unirtm.lock for Reproducibility
+#### 3. Use unigo.lock for Reproducibility
 
-The `unirtm.lock` file ensures consistent installations across environments:
+The `unigo.lock` file ensures consistent installations across environments:
 
 ```bash
 # Verify lock file matches configuration
 unirtm install --frozen
 ```
 
-#### 4. Monitor unirtm Registry Changes
+#### 4. Monitor unigo Registry Changes
 
-Watch for changes in unirtm's registry that might affect your tools:
+Watch for changes in unigo's registry that might affect your tools:
 
 ```bash
 # Check current registry mappings
-unirtm registry | grep -E "(checkmake|gitleaks|hadolint)"
+unigo registry | grep -E "(checkmake|gitleaks|hadolint)"
 ```
 
 ## Verification Steps
@@ -104,13 +104,13 @@ unirtm registry | grep -E "(checkmake|gitleaks|hadolint)"
 1. **Verify Tool Sources**:
 
    ```bash
-   unirtm list | grep -v "npm:" | grep -v "pipx:"
+   unigo list | grep -v "npm:" | grep -v "pipx:"
    ```
 
 2. **Check for Unexpected Backends**:
 
    ```bash
-   unirtm list | grep "aqua:"
+   unigo list | grep "aqua:"
    ```
 
    Should only show tools you explicitly configured with aqua backend.
@@ -119,39 +119,39 @@ unirtm registry | grep -E "(checkmake|gitleaks|hadolint)"
 
    ```bash
    # For GitHub releases, verify against official checksums
-   unirtm where github:checkmake/checkmake
-   sha256sum $(unirtm where github:checkmake/checkmake)/bin/checkmake
+   unigo where github:checkmake/checkmake
+   sha256sum $(unigo where github:checkmake/checkmake)/bin/checkmake
    ```
 
 ### During CI/CD
 
 Our CI workflows already implement:
 
-- ✅ Locked unirtm versions (`UNIRTM_LOCKED=1`)
+- ✅ Locked unigo versions (`UNIRTM_LOCKED=1`)
 - ✅ Explicit tool specs in lint-wrapper.sh
-- ✅ Version pinning in .unirtm.toml
-- ✅ unirtm.lock committed to repository
+- ✅ Version pinning in .unigo.toml
+- ✅ unigo.lock committed to repository
 
 ## Related Security Measures
 
-1. **Dependabot**: Monitors unirtm tool versions
+1. **Dependabot**: Monitors unigo tool versions
 2. **Trivy**: Scans for vulnerabilities in binaries
 3. **SBOM Generation**: Documents all tool dependencies
 4. **Signed Commits**: Ensures code integrity
 
 ## References
 
-- [unirtm Registry Documentation](https://github.com/snowdreamtech/UniRTMregistry.html)
-- [unirtm Security Policy](https://github.com/jdx/unirtm/blob/main/SECURITY.md)
-- [unirtm Paranoid Mode](https://github.com/snowdreamtech/UniRTMparanoid)
+- [unigo Registry Documentation](https://github.com/snowdreamtech/UniGoregistry.html)
+- [unigo Security Policy](https://github.com/jdx/unigo/blob/main/SECURITY.md)
+- [unigo Paranoid Mode](https://github.com/snowdreamtech/UniGoparanoid)
 - [SLSA Framework](https://slsa.dev/)
 
 ## Action Items
 
-- [ ] Monitor unirtm for registry disable feature
+- [ ] Monitor unigo for registry disable feature
 - [ ] Set up automated alerts for registry changes
 - [ ] Document tool source verification in CI
-- [ ] Consider contributing to unirtm for better registry transparency
+- [ ] Consider contributing to unigo for better registry transparency
 
 ---
 

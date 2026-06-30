@@ -86,7 +86,7 @@ env CI=true GITHUB_ACTIONS=true unirtm run audit
 
 - 缺失的必需工具会导致失败（`❌ Failed`）
 - 严格验证工具的可执行性
-- 强制刷新 unirtm 缓存
+- 强制刷新 unigo 缓存
 
 ### 2. 安全扫描
 
@@ -233,9 +233,9 @@ diff local.log ci.log
 
 **A**: CI 模式下会严格验证工具的可执行性。检查：
 
-- 工具是否在 `.unirtm.toml` 中正确配置
+- 工具是否在 `.unigo.toml` 中正确配置
 - 工具版本是否与 `scripts/lib/versions.sh` 一致
-- unirtm 缓存是否需要刷新：`unirtm cache clear`
+- unigo 缓存是否需要刷新：`unigo cache clear`
 
 ### Q2: 如何永久禁用 CI 模式？
 

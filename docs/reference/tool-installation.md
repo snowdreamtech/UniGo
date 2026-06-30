@@ -10,7 +10,7 @@ The project uses a unified tool installation pattern that:
 - Handles platform-specific binary names (e.g., `ec-linux-amd64`, `ec-darwin-arm64`, `hadolint.exe`)
 - Provides atomic verification steps for debugging
 - Supports both CI and local development environments
-- Integrates with unirtm for version management
+- Integrates with unigo for version management
 
 ## The Six-Step Installation Process
 
@@ -36,8 +36,8 @@ if command -v "$BIN_NAME" >/dev/null 2>&1; then
 fi
 
 # Check unirtm installation directory
-if unirtm which "$BIN_NAME" >/dev/null 2>&1; then
-  # Binary found in unirtm
+if unigo which "$BIN_NAME" >/dev/null 2>&1; then
+  # Binary found in unigo
   return 0
 fi
 ```
@@ -68,9 +68,9 @@ Based on the environment (CI vs local development), decide whether to proceed wi
 
 If a non-functional binary is found, remove it before reinstalling.
 
-### Step 5: UniRTM Installation
+### Step 5: UniGo Installation
 
-Use unirtm to install the tool with the specified version.
+Use unigo to install the tool with the specified version.
 
 **Implementation:**
 
@@ -126,18 +126,18 @@ Many tools provide platform-specific binaries with different names. The installa
 
 The system uses a layered resolution strategy:
 
-1. **UniRTM Which** (Primary): `unirtm which <tool>` - handles platform-specific binaries automatically
+1. **UniGo Which** (Primary): `unigo which <tool>` - handles platform-specific binaries automatically
 2. **Command -v** (Fallback 1): `command -v <tool>` - for tools in PATH
-3. **UniRTM Where + Find** (Fallback 2): Search unirtm installation directory with pattern matching
+3. **UniGo Where + Find** (Fallback 2): Search unirtm installation directory with pattern matching
 
 **Example:**
 
 ```bash
 # For editorconfig-checker on Linux x86_64
-# UniRTM automatically resolves to: ec-linux-amd64
+# UniGo automatically resolves to: ec-linux-amd64
 
 # For hadolint on Windows
-# UniRTM automatically resolves to: hadolint.exe
+# UniGo automatically resolves to: hadolint.exe
 ```
 
 ### Performance Considerations
@@ -193,14 +193,14 @@ Each verification step is atomic and reports its status:
 
 **Possible causes:**
 
-- UniRTM installation directory not in PATH
+- UniGo installation directory not in PATH
 - Platform-specific binary name not recognized
 - Installation failed silently
 
 **Solution:**
 
-1. Check unirtm installation: `unirtm list`
-2. Verify PATH includes unirtm shims: `echo $PATH`
+1. Check unirtm installation: `unigo list`
+2. Verify PATH includes unigo shims: `echo $PATH`
 3. Try manual installation: `unirtm install tool-name`
 
 #### Scenario 2: Binary Not Functional
@@ -217,7 +217,7 @@ Each verification step is atomic and reports its status:
 
 **Solution:**
 
-1. Remove and reinstall: `unirtm uninstall tool-name && unirtm install tool-name`
+1. Remove and reinstall: `unigo uninstall tool-name && unirtm install tool-name`
 2. Check tool documentation for dependencies
 3. Verify platform compatibility
 
@@ -230,12 +230,12 @@ Each verification step is atomic and reports its status:
 **Possible causes:**
 
 - Tool doesn't provide binaries for your platform
-- UniRTM provider doesn't support platform-specific names
+- UniGo provider doesn't support platform-specific names
 
 **Solution:**
 
 1. Check tool's GitHub releases for your platform
-2. Update unirtm provider configuration
+2. Update unigo provider configuration
 3. Use alternative installation method
 
 ## Code Examples
@@ -250,7 +250,7 @@ install_tool_safe "shfmt" "${VER_SHFMT_PROVIDER:-}" "Shfmt" "--version" 0 "*.sh 
 **Parameters:**
 
 - `BIN_NAME`: "shfmt" - binary name to verify
-- `PROVIDER`: unirtm provider string (e.g., "github:mvdan/sh")
+- `PROVIDER`: unigo provider string (e.g., "github:mvdan/sh")
 - `DISPLAY_NAME`: "Shfmt" - human-readable name for logging
 - `VERSION_FLAG`: "--version" - flag to check version
 - `SKIP_FILE_CHECK`: 0 - check for relevant files before installing
@@ -329,7 +329,7 @@ CI=true ./scripts/setup.sh
 
 ### UNIRTM_OFFLINE
 
-Use unirtm in offline mode (no network access).
+Use unigo in offline mode (no network access).
 
 **Values:**
 
@@ -395,9 +395,9 @@ For a complete list, see the implementation in `scripts/lib/langs/*.sh`.
 
 - [Alpine Linux Compatibility](../alpine-compatibility.md)
 - [API Documentation](./api-common.md)
-- [Troubleshooting](../troubleshooting-unirtm-provenance.md)
+- [Troubleshooting](../troubleshooting-unigo-provenance.md)
 
 ## References
 
-- [UniRTM Documentation](https://github.com/snowdreamtech/UniRTM)
+- [UniGo Documentation](https://github.com/snowdreamtech/UniGo)
 - [Performance Testing Spec](../../.kiro/specs/performance-testing-and-docs/design.md)

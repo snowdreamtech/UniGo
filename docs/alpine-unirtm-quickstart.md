@@ -1,21 +1,21 @@
-# Alpine Linux + unirtm 快速启动指南
+# Alpine Linux + unigo 快速启动指南
 
 ## 问题诊断
 
-如果你在 Alpine 上遇到 unirtm 安装失败，通常是因为缺少基础依赖。
+如果你在 Alpine 上遇到 unigo 安装失败，通常是因为缺少基础依赖。
 
 ### 常见错误信息
 
 ```bash
 # 错误 1: Python 未找到
 ./configure: exec: line 8: python: not found
-unirtm ERROR sh failed
+unigo ERROR sh failed
 
 # 错误 2: Bash 未找到
 env: 'bash': No such file or directory
 
 # 错误 3: GPG 未找到（警告）
-unirtm WARN gpg not found, skipping verification
+unigo WARN gpg not found, skipping verification
 ```
 
 ## 快速解决方案
@@ -33,10 +33,10 @@ apk add --no-cache \
     python3
 ```
 
-### 步骤 2: 安装 unirtm
+### 步骤 2: 安装 unigo
 
 ```bash
-curl https://unirtm.run | sh
+curl https://unigo.run | sh
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
@@ -53,7 +53,7 @@ unirtm install python@3.14.3
 unirtm install go@1.26.2
 
 # 激活工具
-unirtm use node@25.9.0 python@3.14.3 go@1.26.2
+unigo use node@25.9.0 python@3.14.3 go@1.26.2
 ```
 
 ## 完整 Dockerfile 示例
@@ -72,12 +72,12 @@ RUN apk add --no-cache \
     gpg \
     python3
 
-# 安装 unirtm
-RUN curl https://unirtm.run | sh
+# 安装 unigo
+RUN curl https://unigo.run | sh
 ENV PATH="/root/.local/bin:$PATH"
 
 # 复制配置并安装工具
-COPY .unirtm.toml .
+COPY .unigo.toml .
 RUN unirtm install
 
 WORKDIR /app
@@ -103,12 +103,12 @@ RUN apk add --no-cache \
     linux-headers \
     binutils-gold
 
-# 安装 unirtm
-RUN curl https://unirtm.run | sh
+# 安装 unigo
+RUN curl https://unigo.run | sh
 ENV PATH="/root/.local/bin:$PATH"
 
 # 复制配置并安装工具
-COPY .unirtm.toml .
+COPY .unigo.toml .
 RUN unirtm install
 
 WORKDIR /app
@@ -123,8 +123,8 @@ CMD ["node", "index.js"]
 
 | 包 | 用途 | 是否必需 |
 |---|------|---------|
-| `bash` | unirtm 和构建脚本需要 | ✅ 必需 |
-| `curl` | 下载 unirtm 和工具 | ✅ 必需 |
+| `bash` | unigo 和构建脚本需要 | ✅ 必需 |
+| `curl` | 下载 unigo 和工具 | ✅ 必需 |
 | `git` | 版本控制和某些工具安装 | ✅ 必需 |
 | `ca-certificates` | HTTPS 下载 | ✅ 必需 |
 | `gpg` | 验证下载签名 | ⚠️ 推荐 |
@@ -143,11 +143,11 @@ CMD ["node", "index.js"]
 ## 验证安装
 
 ```bash
-# 检查 unirtm 版本
-unirtm --version
+# 检查 unigo 版本
+unigo --version
 
 # 检查已安装的工具
-unirtm list
+unigo list
 
 # 检查 Node.js
 node --version
@@ -160,7 +160,7 @@ python --version
 go version
 
 # 验证二进制文件类型（确认是 musl）
-file $(unirtm which node)
+file $(unigo which node)
 # 应该显示: dynamically linked, interpreter /lib/ld-musl-x86_64.so.1
 ```
 
@@ -168,7 +168,7 @@ file $(unirtm which node)
 
 ### 使用国内镜像加速
 
-在 `.unirtm.toml` 中配置：
+在 `.unigo.toml` 中配置：
 
 ```toml
 [env]
@@ -199,12 +199,12 @@ RUN apk add --no-cache \
     bash curl git ca-certificates gpg python3 \
     build-base linux-headers binutils-gold
 
-# 安装 unirtm
-RUN curl https://unirtm.run | sh
+# 安装 unigo
+RUN curl https://unigo.run | sh
 ENV PATH="/root/.local/bin:$PATH"
 
 # 安装工具
-COPY .unirtm.toml .
+COPY .unigo.toml .
 RUN unirtm install
 
 # 构建应用
@@ -221,11 +221,11 @@ FROM alpine:3.22
 RUN apk add --no-cache libstdc++ libgcc
 
 # 从构建阶段复制工具和应用
-COPY --from=builder /root/.local/share/unirtm/installs /root/.local/share/unirtm/installs
+COPY --from=builder /root/.local/share/unigo/installs /root/.local/share/unigo/installs
 COPY --from=builder /app /app
 
 # 设置环境变量
-ENV PATH="/root/.local/share/unirtm/installs/node/25.9.0/bin:$PATH"
+ENV PATH="/root/.local/share/unigo/installs/node/25.9.0/bin:$PATH"
 
 WORKDIR /app
 CMD ["node", "index.js"]
@@ -233,16 +233,16 @@ CMD ["node", "index.js"]
 
 ## 故障排除
 
-### 问题 1: unirtm 安装卡住
+### 问题 1: unigo 安装卡住
 
 ```bash
 # 检查网络连接
-ping -c 3 unirtm.run
+ping -c 3 unigo.run
 
 # 使用代理
 export HTTP_PROXY=http://proxy.example.com:8080
 export HTTPS_PROXY=http://proxy.example.com:8080
-curl https://unirtm.run | sh
+curl https://unigo.run | sh
 ```
 
 ### 问题 2: 工具安装失败
@@ -252,7 +252,7 @@ curl https://unirtm.run | sh
 UNIRTM_DEBUG=1 unirtm install node@25.9.0
 
 # 清除缓存重试
-rm -rf ~/.cache/unirtm
+rm -rf ~/.cache/unigo
 unirtm install node@25.9.0
 ```
 
@@ -260,7 +260,7 @@ unirtm install node@25.9.0
 
 ```bash
 # 检查可用版本
-unirtm ls-remote node
+unigo ls-remote node
 
 # 如果没有 musl 预编译包，安装编译依赖
 apk add build-base linux-headers binutils-gold
@@ -291,7 +291,7 @@ docker pull node:25.9.0-alpine3.22
 
 ## 参考资源
 
-- [unirtm 官方文档](https://github.com/snowdreamtech/UniRTM)
+- [unigo 官方文档](https://github.com/snowdreamtech/UniGo)
 - [Alpine Linux 包搜索](https://pkgs.alpinelinux.org/)
 - [Node.js Unofficial Builds](https://unofficial-builds.nodejs.org/)
 - [Docker Hub - Alpine](https://hub.docker.com/_/alpine)

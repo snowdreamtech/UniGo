@@ -18,7 +18,7 @@ behavioral rules distributed to 50+ IDEs via a symlink/redirect pattern.
 
 | Dependency | Version  | Purpose                      |
 | ---------- | -------- | ---------------------------- |
-| `unirtm`     | ≥ 2024.x | Toolchain version management |
+| `unigo`     | ≥ 2024.x | Toolchain version management |
 | `make`     | System   | Task orchestration           |
 | `git`      | ≥ 2.x    | Version control and hooks    |
 | `node`     | ≥ 20.x   | Documentation (VitePress)    |
@@ -43,7 +43,7 @@ behavioral rules distributed to 50+ IDEs via a symlink/redirect pattern.
 git clone <repo-url>
 cd <repo>
 git config core.ignorecase false   # MANDATORY on macOS/Windows
-unirtm run setup                          # installs unirtm + core tools
+unirtm run setup                          # installs unigo + core tools
 unirtm run install                        # installs project dependencies (Node, Python venv)
 unirtm run verify                         # validates everything is green
 ```
@@ -66,7 +66,7 @@ cd docs && pnpm update
 pre-commit autoupdate
 
 # Tool versions
-unirtm upgrade
+unigo upgrade
 ```
 
 ### Build Documentation

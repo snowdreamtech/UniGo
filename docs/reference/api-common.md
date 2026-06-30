@@ -19,7 +19,7 @@ install_tool_safe BIN_NAME PROVIDER DISPLAY_NAME [VERSION_FLAG] [SKIP_FILE_CHECK
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `BIN_NAME` | string | Yes | - | Binary name to verify (e.g., "shfmt", "ec-linux-amd64") |
-| `PROVIDER` | string | Yes | - | UniRTM provider string (e.g., "github:mvdan/sh") |
+| `PROVIDER` | string | Yes | - | UniGo provider string (e.g., "github:mvdan/sh") |
 | `DISPLAY_NAME` | string | Yes | - | Human-readable name for logging |
 | `VERSION_FLAG` | string | No | "--version" | Flag to check version |
 | `SKIP_FILE_CHECK` | integer | No | 0 | Skip file detection (0=check, 1=skip) |
@@ -60,11 +60,11 @@ install_tool_safe "tool" "${VER_TOOL_PROVIDER:-}" "Tool Name" "--version" 0 "*.e
 
 The function follows a six-step process:
 
-1. **Binary Detection**: Checks if binary exists using `command -v`, `unirtm which`, or filesystem search
+1. **Binary Detection**: Checks if binary exists using `command -v`, `unigo which`, or filesystem search
 2. **Version Verification**: Verifies binary responds to version flag
 3. **Installation Decision**: Decides whether to install based on environment (CI vs local)
 4. **Cleanup**: Removes non-functional binaries if found
-5. **UniRTM Installation**: Installs tool using unirtm
+5. **UniGo Installation**: Installs tool using unigo
 6. **Post-Install Verification**: Verifies installation was successful
 
 **Performance:**
@@ -151,7 +151,7 @@ fi
 **Resolution Strategy:**
 
 1. Check with `command -v`
-2. Check with `unirtm which`
+2. Check with `unigo which`
 3. Search unirtm installation directory with `find`
 
 **Performance:**
@@ -533,9 +533,9 @@ fi
 ## Related Documentation
 
 - [Tool Installation Architecture](./tool-installation.md)
-- [Troubleshooting](../troubleshooting-unirtm-provenance.md)
+- [Troubleshooting](../troubleshooting-unigo-provenance.md)
 
 ## References
 
-- [UniRTM Documentation](https://github.com/snowdreamtech/UniRTM)
+- [UniGo Documentation](https://github.com/snowdreamtech/UniGo)
 - [POSIX Shell Scripting](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html)
