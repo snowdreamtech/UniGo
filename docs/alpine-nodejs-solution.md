@@ -5,7 +5,7 @@
 ### 方案一的问题 ❌
 
 ```toml
-# .unigo.toml
+# .unirtm.toml
 [settings]
 node.flavor = "musl"  # ⚠️ 会影响所有系统！
 ```
@@ -40,7 +40,7 @@ RUN apk add --no-cache nodejs npm
 
 ### 方案 3: 使用环境变量（推荐）✅
 
-在不同环境使用不同配置，而不是在 `.unigo.toml` 中硬编码。
+在不同环境使用不同配置，而不是在 `.unirtm.toml` 中硬编码。
 
 #### Dockerfile 配置（方案 3）
 
@@ -59,16 +59,16 @@ ENV UNIRTM_NODE_MIRROR_URL="https://unofficial-builds.nodejs.org/download/releas
 ENV UNIRTM_NODE_FLAVOR="musl"
 
 # 复制配置文件（不包含 node.flavor 设置）
-COPY .unigo.toml .
+COPY .unirtm.toml .
 
 # 安装工具（会自动使用环境变量）
 RUN unirtm install
 ```
 
-#### .unigo.toml 配置（方案 3）
+#### .unirtm.toml 配置（方案 3）
 
 ```toml
-# .unigo.toml - 不包含 node.flavor 设置
+# .unirtm.toml - 不包含 node.flavor 设置
 [tools]
 node = "25.9.0"  # 可以指定精确版本
 python = "3.14.3"
@@ -112,7 +112,7 @@ ENV UNIRTM_NODE_MIRROR_URL="https://unofficial-builds.nodejs.org/download/releas
 ENV UNIRTM_NODE_FLAVOR="musl"
 
 # 复制配置并安装
-COPY .unigo.toml package*.json ./
+COPY .unirtm.toml package*.json ./
 RUN unirtm install
 
 # 安装项目依赖
@@ -150,12 +150,12 @@ unigo 支持根据环境变量选择不同的配置文件。
 
 ```
 .
-├── .unigo.toml              # 默认配置（glibc）
-├── .unigo.alpine.toml       # Alpine 专用配置
+├── .unirtm.toml              # 默认配置（glibc）
+├── .unirtm.alpine.toml       # Alpine 专用配置
 └── Dockerfile
 ```
 
-### .unigo.toml（默认配置）
+### .unirtm.toml（默认配置）
 
 ```toml
 [tools]
@@ -166,7 +166,7 @@ go = "1.26.2"
 # 默认不设置 flavor（使用 glibc）
 ```
 
-### .unigo.alpine.toml（Alpine 专用）
+### .unirtm.alpine.toml（Alpine 专用）
 
 ```toml
 [tools]
@@ -189,7 +189,7 @@ RUN curl https://unigo.run | sh
 ENV PATH="/root/.local/bin:$PATH"
 
 # 复制 Alpine 专用配置
-COPY .unigo.alpine.toml .unigo.toml
+COPY .unirtm.alpine.toml .unirtm.toml
 
 RUN unirtm install
 ```
@@ -223,13 +223,13 @@ RUN curl https://unigo.run | sh
 ENV PATH="/root/.local/bin:$PATH"
 
 # 复制配置（注释掉 node）
-COPY .unigo.toml .
+COPY .unirtm.toml .
 
 # 只安装其他工具（不安装 node）
 RUN unirtm install
 ```
 
-### .unigo.toml（方案 6）
+### .unirtm.toml（方案 6）
 
 ```toml
 [tools]
@@ -269,13 +269,13 @@ go = "1.26.2"
 
 ```
 .
-├── .unigo.toml
+├── .unirtm.toml
 ├── Dockerfile.alpine       # Alpine 专用
 ├── Dockerfile.node-alpine  # 使用官方 Node 镜像
 └── docker-compose.yml
 ```
 
-### .unigo.toml（完整示例）
+### .unirtm.toml（完整示例）
 
 ```toml
 # 本地开发配置（glibc）
@@ -302,7 +302,7 @@ RUN curl https://unigo.run | sh
 ENV PATH="/root/.local/bin:$PATH"
 
 # 复制配置
-COPY .unigo.toml package*.json ./
+COPY .unirtm.toml package*.json ./
 
 # 安装其他工具（跳过 node）
 RUN unirtm install python go
@@ -359,7 +359,7 @@ services:
    FROM node:25.9.0-alpine3.19
    ```
 
-2. **.unigo.toml 保持简洁**
+2. **.unirtm.toml 保持简洁**
 
    ```toml
    # 本地开发用 glibc 版本

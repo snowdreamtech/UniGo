@@ -10,7 +10,7 @@ UniGo 从设计之初就以对齐 `mise` 的生态为核心，因此在各个维
 
 | 维度 | jdx/mise 支持情况 | snowdreamtech/UniGo 支持情况 | 兼容度与迁移策略 |
 | :--- | :--- | :--- | :---: |
-| **配置文件** | `.mise.toml` / `mise.toml` | `.unigo.toml` / `unigo.toml` | **99% (极易)**<br>支持使用命令 `unirtm migrate` 自动无缝转换。 |
+| **配置文件** | `.mise.toml` / `mise.toml` | `.unirtm.toml` / `unigo.toml` | **99% (极易)**<br>支持使用命令 `unirtm migrate` 自动无缝转换。 |
 | **核心配置语法**| 包含 `[tools]`、`[env]`、`[settings]`、`[tasks]` | 完全对齐并兼容其 TOML 语法结构 | **100% (完美)**<br>底层模型无缝支持。 |
 | **环境激活命令**| `eval "$(mise activate zsh)"` | `eval "$(unirtm activate zsh)"` | **100% (完美)**<br>仅需在 Shell 配置文件中替换别名即可。 |
 | **常用命令行** | `install`/`uninstall`/`use`/`exec`/`run` | 完全等价支持 (Parity) | **100% (完美)**<br>可通过 `alias` 达到无感知兼容。 |
@@ -64,7 +64,7 @@ allowed-endpoints: >
 
 ```mermaid
 graph TD
-    A[第一步: 本地自举转换] -->|unirtm migrate| B[第二步: 生成 .unigo.toml]
+    A[第一步: 本地自举转换] -->|unirtm migrate| B[第二步: 生成 .unirtm.toml]
     B --> C[第三步: Shell 终端激活替换]
     C -->|验证无误后| D[第四步: CI/CD 及 cd.yml 替换]
 ```
@@ -79,7 +79,7 @@ graph TD
 unirtm migrate
 ```
 
-此操作将自动分析 `.mise.toml` 中所有的 Tools、Env 和 Settings，生成完美的 [.unigo.toml](../.unigo.toml)（我们目前已经为您生成并提交了这一步）。
+此操作将自动分析 `.mise.toml` 中所有的 Tools、Env 和 Settings，生成完美的 [.unirtm.toml](../.unirtm.toml)（我们目前已经为您生成并提交了这一步）。
 
 #### 第二步：替换 Shell 激活脚本
 

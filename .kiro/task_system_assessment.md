@@ -45,7 +45,7 @@ UniGo (开放多模态):
 ### 🛡️ 超越 B：高可用的“多源任务聚合 (Aggregated Task Listing)”
 
 * 当您在终端输入 `unigo task ls`（或 `unirtm run` 缺省参数）时，UniGo 任务引擎会**横向扫描所有已注册 of Runner**：
-    1. 扫描 `.unigo.toml` 中的原生 `[tasks]` 定义；
+    1. 扫描 `.unirtm.toml` 中的原生 `[tasks]` 定义；
     2. 读取 `Makefile` 中的常用伪目标（Phony Targets）；
     3. 读取 `Justfile` 中的所有快捷目标；
     4. 读取 `Taskfile` 中的 YAML 目标。

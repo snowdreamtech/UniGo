@@ -40,7 +40,7 @@ hadolint                      aqua:hadolint/hadolint
 
 ### ✅ Already Implemented
 
-1. **Explicit Backend Specification**: All tools in `.unigo.toml` use explicit backends:
+1. **Explicit Backend Specification**: All tools in `.unirtm.toml` use explicit backends:
    - `github:owner/repo` for GitHub releases
    - `npm:package` for npm packages
    - `pipx:package` for Python packages
@@ -54,7 +54,7 @@ hadolint                      aqua:hadolint/hadolint
      ;;
    ```
 
-3. **Version Pinning**: All tools are pinned to specific versions in `.unigo.toml`
+3. **Version Pinning**: All tools are pinned to specific versions in `.unirtm.toml`
 
 ### 🔒 Additional Recommendations
 
@@ -79,9 +79,9 @@ unigo list
 unirtm exec -- <tool> --version
 ```
 
-#### 3. Use unigo.lock for Reproducibility
+#### 3. Use unirtm.lock for Reproducibility
 
-The `unigo.lock` file ensures consistent installations across environments:
+The `unirtm.lock` file ensures consistent installations across environments:
 
 ```bash
 # Verify lock file matches configuration
@@ -129,8 +129,8 @@ Our CI workflows already implement:
 
 - ✅ Locked unigo versions (`UNIRTM_LOCKED=1`)
 - ✅ Explicit tool specs in lint-wrapper.sh
-- ✅ Version pinning in .unigo.toml
-- ✅ unigo.lock committed to repository
+- ✅ Version pinning in .unirtm.toml
+- ✅ unirtm.lock committed to repository
 
 ## Related Security Measures
 

@@ -1,4 +1,4 @@
-# .unigo.toml Commands
+# .unirtm.toml Commands
 
 All common tasks are unified under `make`. Run `unirtm run help` to see all available targets.
 
@@ -64,7 +64,7 @@ make clean    # Remove build artifacts and temporary files
 
 ## Cross-Platform Behavior
 
-The .unigo.toml automatically detects your operating system and uses the appropriate package manager:
+The .unirtm.toml automatically detects your operating system and uses the appropriate package manager:
 
 | OS                    | Package Manager   |
 | --------------------- | ----------------- |

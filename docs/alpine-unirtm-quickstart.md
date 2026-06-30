@@ -77,7 +77,7 @@ RUN curl https://unigo.run | sh
 ENV PATH="/root/.local/bin:$PATH"
 
 # 复制配置并安装工具
-COPY .unigo.toml .
+COPY .unirtm.toml .
 RUN unirtm install
 
 WORKDIR /app
@@ -108,7 +108,7 @@ RUN curl https://unigo.run | sh
 ENV PATH="/root/.local/bin:$PATH"
 
 # 复制配置并安装工具
-COPY .unigo.toml .
+COPY .unirtm.toml .
 RUN unirtm install
 
 WORKDIR /app
@@ -168,7 +168,7 @@ file $(unigo which node)
 
 ### 使用国内镜像加速
 
-在 `.unigo.toml` 中配置：
+在 `.unirtm.toml` 中配置：
 
 ```toml
 [env]
@@ -204,7 +204,7 @@ RUN curl https://unigo.run | sh
 ENV PATH="/root/.local/bin:$PATH"
 
 # 安装工具
-COPY .unigo.toml .
+COPY .unirtm.toml .
 RUN unirtm install
 
 # 构建应用

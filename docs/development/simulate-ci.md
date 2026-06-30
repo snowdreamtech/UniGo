@@ -233,7 +233,7 @@ diff local.log ci.log
 
 **A**: CI 模式下会严格验证工具的可执行性。检查：
 
-- 工具是否在 `.unigo.toml` 中正确配置
+- 工具是否在 `.unirtm.toml` 中正确配置
 - 工具版本是否与 `scripts/lib/versions.sh` 一致
 - unigo 缓存是否需要刷新：`unigo cache clear`
 
