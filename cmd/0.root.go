@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/snowdreamtech/unigo/internal/hello"
+	"github.com/snowdreamtech/unigo/internal/pkg/logger"
 	"github.com/spf13/cobra"
 )
 
@@ -23,6 +24,10 @@ var rootCmd = &cobra.Command{
 	Use:   "unigo",
 	Short: "UniGo is a Golang template hello world application",
 	Long:  `A fast and flexible Golang template referencing UniRTM and helloworld.`,
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		// Initialize the global logger before any command runs
+		logger.Init(debug, quiet, jsonFmt)
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		hello.PrintHello()
 	},
