@@ -91,7 +91,7 @@ func runDoctor(cmd *cobra.Command, args []string) error {
 	// 5. Health Checks
 	pterm.DefaultSection.Println("🌐 Health Checks")
 	suggestions := 0
-	
+
 	// DB Check
 	dbPath := env.GetDatabasePath()
 	db, err := database.Open(ctx, database.Config{Path: dbPath, WALMode: true})

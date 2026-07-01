@@ -65,7 +65,7 @@ var configGetCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		key := args[0]
 		slog.Debug("Getting config value", "key", key)
-		
+
 		conf := loadConfig()
 		if val, ok := conf[key]; ok {
 			fmt.Println(val)
@@ -84,14 +84,14 @@ var configSetCmd = &cobra.Command{
 		key := args[0]
 		val := args[1]
 		slog.Debug("Setting config value", "key", key, "value", val)
-		
+
 		conf := loadConfig()
 		conf[key] = val
 		if err := saveConfig(conf); err != nil {
 			pterm.Error.Printf("Failed to save configuration: %v\n", err)
 			return err
 		}
-		
+
 		pterm.Success.Printf("Set '%s' to '%s'\n", key, val)
 		return nil
 	},

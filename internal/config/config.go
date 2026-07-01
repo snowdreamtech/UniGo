@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 
 	"github.com/pelletier/go-toml/v2"
-	"gopkg.in/yaml.v3"
 	"github.com/snowdreamtech/unigo/internal/pkg/env"
+	"gopkg.in/yaml.v3"
 )
 
 // Config represents the application configuration.

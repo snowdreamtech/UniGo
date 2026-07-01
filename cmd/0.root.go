@@ -7,22 +7,22 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/snowdreamtech/unigo/internal/cli/output"
 	"github.com/snowdreamtech/unigo/internal/hello"
 	"github.com/snowdreamtech/unigo/internal/pkg/env"
 	"github.com/snowdreamtech/unigo/internal/pkg/errors"
 	"github.com/snowdreamtech/unigo/internal/pkg/logger"
 	"github.com/snowdreamtech/unigo/internal/updater"
 	"github.com/spf13/cobra"
-	"github.com/snowdreamtech/unigo/internal/cli/output"
 )
 
 var (
-	cfgFile  string
-	quiet    bool
-	silent   bool
-	noConfig bool
-	debug    bool
-	verbose  bool
+	cfgFile    string
+	quiet      bool
+	silent     bool
+	noConfig   bool
+	debug      bool
+	verbose    bool
 	jsonOutput bool
 	dryRun     bool
 	cdDir      string
