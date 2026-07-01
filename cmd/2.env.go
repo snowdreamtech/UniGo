@@ -5,8 +5,10 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
+	"github.com/pterm/pterm"
 	"github.com/snowdreamtech/unigo/internal/pkg/env"
 	"github.com/snowdreamtech/unigo/internal/sysinfo"
 	"github.com/spf13/cobra"
@@ -28,15 +30,38 @@ var envCmd = &cobra.Command{
 }
 
 func runEnv(cmd *cobra.Command, args []string) error {
-	vars := []string{
-		fmt.Sprintf("%s_CONFIG_DIR=%s", strings.ToUpper(env.ProjectName), env.GetConfigDir()),
-		fmt.Sprintf("%s_DATA_DIR=%s", strings.ToUpper(env.ProjectName), env.GetDataDir()),
-		fmt.Sprintf("%s_CACHE_DIR=%s", strings.ToUpper(env.ProjectName), env.GetCacheDir()),
-		fmt.Sprintf("%s_IS_MUSL=%t", strings.ToUpper(env.ProjectName), sysinfo.IsMusl()),
+	vars := []struct {
+		Name  string
+		Value string
+	}{
+		{fmt.Sprintf("%s_CONFIG_DIR", strings.ToUpper(env.ProjectName)), env.GetConfigDir()},
+		{fmt.Sprintf("%s_DATA_DIR", strings.ToUpper(env.ProjectName)), env.GetDataDir()},
+		{fmt.Sprintf("%s_CACHE_DIR", strings.ToUpper(env.ProjectName)), env.GetCacheDir()},
+		{fmt.Sprintf("%s_IS_MUSL", strings.ToUpper(env.ProjectName)), fmt.Sprintf("%t", sysinfo.IsMusl())},
 	}
 
-	for _, v := range vars {
-		fmt.Println(v)
+	isTerminal := false
+	if stat, err := os.Stdout.Stat(); err == nil {
+		isTerminal = (stat.Mode() & os.ModeCharDevice) != 0
+	}
+
+	if isTerminal {
+		pterm.DefaultSection.Println("🔑 Environment Variables")
+		var data [][]string
+		data = append(data, []string{"Variable", "Value"})
+		for _, v := range vars {
+			data = append(data, []string{
+				pterm.Bold.Sprint(v.Name),
+				pterm.LightCyan(v.Value),
+			})
+		}
+		pterm.DefaultTable.WithHasHeader().WithData(data).Render()
+		fmt.Println()
+		pterm.Info.Println("To apply this environment, run: " + pterm.LightMagenta("eval \"$(unigo env)\""))
+	} else {
+		for _, v := range vars {
+			fmt.Printf("export %s=%q\n", v.Name, v.Value)
+		}
 	}
 
 	return nil
