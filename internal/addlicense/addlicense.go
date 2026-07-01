@@ -28,6 +28,7 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
+	"log/slog"
 
 	doublestar "github.com/bmatcuk/doublestar/v4"
 	"golang.org/x/sync/errgroup"
@@ -166,9 +167,9 @@ func processFiles(paths []string, opts Options, checkOnly bool) (int, error) {
 		if r.changed {
 			count++
 			if checkOnly {
-				fmt.Printf("missing license header: %s\n", r.path)
+				slog.Info("missing license header", slog.String("path", r.path))
 			} else if opts.Verbose {
-				fmt.Printf("modified: %s\n", r.path)
+				slog.Info("modified", slog.String("path", r.path))
 			}
 		}
 		if r.err != nil && firstErr == nil {
@@ -202,7 +203,7 @@ func walk(ch chan<- *file, start string, ignorePatterns []string, skipExts []str
 		}
 		if fileMatches(path, ignorePatterns) {
 			if verbose {
-				fmt.Printf("skipping: %s\n", path)
+				slog.Debug("skipping", slog.String("path", path))
 			}
 			return nil
 		}
@@ -210,7 +211,7 @@ func walk(ch chan<- *file, start string, ignorePatterns []string, skipExts []str
 			ext := strings.ToLower(strings.TrimPrefix(filepath.Ext(path), "."))
 			if _, skip := skipSet[ext]; skip {
 				if verbose {
-					fmt.Printf("skipping (ext): %s\n", path)
+					slog.Debug("skipping (ext)", slog.String("path", path))
 				}
 				return nil
 			}
