@@ -578,25 +578,6 @@ func TestHTTPDownloader_DownloadConcurrent(t *testing.T) {
 	assert.Equal(t, content[:100], downloaded[:100])
 }
 
-func TestHTTPDownloader_VerifyGPGSignature_NoKeyring(t *testing.T) {
-	// Create test server
-	content := []byte("test file content")
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Length", fmt.Sprintf("%d", len(content)))
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write(content)
-	}))
-	defer server.Close()
-
-	tmpDir := t.TempDir()
-	t.Setenv("UNIGO_DATA_DIR", tmpDir) // keyring not found
-
-	downloader := download.NewHTTPDownloader()
-	res := &download.GPGResult{}
-	err := downloader.Download(context.Background(), server.URL+"/file", filepath.Join(tmpDir, "dst"), download.DefaultDownloadOptions().WithVerifyGPG(true, res))
-	require.Error(t, err) // keyring not found error
-}
-
 func TestHTTPDownloader_VerifyGPGSignature_Skipped(t *testing.T) {
 	// Create test server
 	content := []byte("test file content")

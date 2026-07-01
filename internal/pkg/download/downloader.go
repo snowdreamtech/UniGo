@@ -114,6 +114,9 @@ type DownloadOptions struct {
 
 	// GitHubToken is a personal access token for GitHub API (optional).
 	GitHubToken string
+
+	// TrustedFingerprints is a list of trusted GPG fingerprints to verify against.
+	TrustedFingerprints []string
 }
 
 // GPGResult holds the result of a GPG verification attempt.
@@ -166,8 +169,9 @@ func (o DownloadOptions) WithProgressCallback(callback func(int64, int64)) Downl
 
 // WithVerifyGPG returns a copy of the options with VerifyGPG set,
 // and binds the given result pointer to store the verification outcome.
-func (o DownloadOptions) WithVerifyGPG(verify bool, result *GPGResult) DownloadOptions {
+func (o DownloadOptions) WithVerifyGPG(verify bool, result *GPGResult, fingerprints ...string) DownloadOptions {
 	o.VerifyGPG = verify
 	o.GPGResult = result
+	o.TrustedFingerprints = append(o.TrustedFingerprints, fingerprints...)
 	return o
 }

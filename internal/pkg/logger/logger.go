@@ -32,12 +32,12 @@ func Init(debug, quiet, silent, jsonFmt bool) {
 		Level: level,
 	}
 
-	// 2. Determine output format (JSON vs Text)
+	// 2. Determine output format (JSON vs Text/Pterm)
 	var handler slog.Handler
 	if jsonFmt {
 		handler = slog.NewJSONHandler(os.Stderr, opts)
 	} else {
-		handler = slog.NewTextHandler(os.Stderr, opts)
+		handler = NewPtermHandler(level)
 	}
 
 	// 3. Set global logger

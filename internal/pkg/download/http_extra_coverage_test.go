@@ -30,34 +30,6 @@ func TestHTTPDownloader_VerifyChecksum_OpenError(t *testing.T) {
 	// Don't assert exact error string as it varies by OS ("is a directory" vs "Access is denied")
 }
 
-// TestHTTPDownloader_VerifyGPGSignature_KeyringPermissionDenied verifies error handling for unreadable keyring.
-func TestHTTPDownloader_VerifyGPGSignature_KeyringPermissionDenied(t *testing.T) {
-	tmpDir := t.TempDir()
-	t.Setenv("UNIGO_DATA_DIR", tmpDir)
-
-	// Use a directory to guarantee a read error cross-platform
-	keyringPath := filepath.Join(tmpDir, "keyring.gpg")
-	require.NoError(t, os.Mkdir(keyringPath, 0755))
-
-	downloader := download.NewHTTPDownloader()
-	res := &download.GPGResult{}
-	opts := download.DefaultDownloadOptions().WithVerifyGPG(true, res).WithMaxRetries(0)
-
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte("test"))
-	}))
-	defer server.Close()
-
-	dest := filepath.Join(tmpDir, "test.txt")
-	err := downloader.Download(context.Background(), server.URL, dest, opts)
-
-	assert.Error(t, err)
-	// It will either fail to open (Windows) or fail to read/parse (Unix).
-	// We just verify it failed due to some GPG/keyring issue.
-	assert.Contains(t, err.Error(), "keyring")
-}
-
 // TestHTTPDownloader_VerifyGPGSignature_FetchError verifies error handling when context is cancelled.
 func TestHTTPDownloader_Download_ContextCancelled(t *testing.T) {
 	tmpDir := t.TempDir()

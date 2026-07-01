@@ -113,5 +113,5 @@ func TestHTTPDownloader_VerifyGPGSignature_500(t *testing.T) {
 	// An empty file will trigger "failed to parse keyring", but we want it to parse
 	// Actually we just test what happens if keyring fails to parse, wait we already did that.
 	// We want to hit the 500 error branch:
-	_ = dl.verifyGPGSignature(context.Background(), ts.URL, dest)
+	_ = dl.verifyGPGSignature(context.Background(), ts.URL, dest, DownloadOptions{})
 }

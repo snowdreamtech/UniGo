@@ -29,9 +29,9 @@ import (
 	"golang.org/x/crypto/blake2s"
 	"golang.org/x/crypto/sha3"
 
-	"github.com/ProtonMail/go-crypto/openpgp"
 	"github.com/snowdreamtech/unigo/internal/pkg/env"
 	"github.com/snowdreamtech/unigo/internal/pkg/errors"
+	"github.com/snowdreamtech/unigo/internal/pkg/gpg"
 	pkgHttp "github.com/snowdreamtech/unigo/internal/pkg/http"
 	"log/slog"
 )
@@ -209,7 +209,7 @@ func (h *HTTPDownloader) Download(ctx context.Context, url string, destination s
 
 			// Verify GPG signature if specified
 			if opts.VerifyGPG {
-				err := h.verifyGPGSignature(ctx, url, destination)
+				err := h.verifyGPGSignature(ctx, url, destination, opts)
 				if err != nil {
 					if err == ErrGPGSkipped {
 						if opts.GPGResult != nil {
@@ -512,23 +512,8 @@ func (h *HTTPDownloader) VerifyChecksum(ctx context.Context, file string, expect
 	return nil
 }
 
-// verifyGPGSignature downloads a detached signature (.sig or .asc) and verifies it against the local keyring.
-func (h *HTTPDownloader) verifyGPGSignature(ctx context.Context, targetURL, destination string) error {
-	keyringPath := filepath.Join(env.GetDataDir(), "keyring.gpg")
-	keyringFile, err := os.Open(keyringPath)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return errors.NewUserError(fmt.Sprintf("keyring not found at %s. Please add trusted keys first", keyringPath), nil)
-		}
-		return errors.NewSystemError("failed to open keyring", err)
-	}
-	defer keyringFile.Close()
-
-	keyring, err := openpgp.ReadKeyRing(keyringFile)
-	if err != nil {
-		return errors.NewSystemError("failed to parse keyring", err)
-	}
-
+// verifyGPGSignature downloads a detached signature (.sig or .asc) and verifies it using the GPG verifier.
+func (h *HTTPDownloader) verifyGPGSignature(ctx context.Context, targetURL, destination string, opts DownloadOptions) error {
 	// Try .sig first, then .asc
 	sigURL := targetURL + ".sig"
 	sigDest := destination + ".sig"
@@ -551,7 +536,9 @@ func (h *HTTPDownloader) verifyGPGSignature(ctx context.Context, targetURL, dest
 			return errors.NewExternalError("failed to fetch signature", err)
 		}
 		if resp.StatusCode != http.StatusOK {
-			resp.Body.Close()
+			if resp.Body != nil {
+				resp.Body.Close()
+			}
 			// If neither .sig nor .asc exist, just skip verification (assume unsigned)
 			if resp.StatusCode == http.StatusNotFound {
 				return ErrGPGSkipped
@@ -562,33 +549,26 @@ func (h *HTTPDownloader) verifyGPGSignature(ctx context.Context, targetURL, dest
 
 	sigFile, err := os.Create(sigDest)
 	if err != nil {
-		resp.Body.Close()
+		if resp.Body != nil {
+			resp.Body.Close()
+		}
 		return err
 	}
 	defer os.Remove(sigDest)
 
 	_, err = io.Copy(sigFile, resp.Body)
-	resp.Body.Close()
+	if resp.Body != nil {
+		resp.Body.Close()
+	}
 	sigFile.Close() // Close before reading for verification
 
 	if err != nil {
 		return errors.NewSystemError("failed to save signature file", err)
 	}
 
-	// Perform verification
-	targetFile, err := os.Open(destination)
-	if err != nil {
-		return err
-	}
-	defer targetFile.Close()
-
-	sigFileRead, err := os.Open(sigDest)
-	if err != nil {
-		return err
-	}
-	defer sigFileRead.Close()
-
-	_, err = openpgp.CheckDetachedSignature(keyring, targetFile, sigFileRead, nil)
+	// Perform verification using the robust verifier
+	verifier := gpg.NewVerifier()
+	err = verifier.Verify(ctx, sigDest, destination, opts.TrustedFingerprints)
 	if err != nil {
 		return errors.Wrap(errors.ErrChecksumMismatch, "GPG signature verification failed: %v", err)
 	}
