@@ -36,6 +36,7 @@ exclude: |
     \.specify/|
     \.tmp/|tmp/|
     \.(venv|idx|continue|history|vscode-test)/.*|
+    internal/addlicense/testdata/.*|
     \.aider\.conf\.yml
   )
 
