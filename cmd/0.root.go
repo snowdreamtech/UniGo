@@ -16,17 +16,30 @@ var (
 	cfgFile string
 	quiet   bool
 	debug   bool
+	verbose bool
 	jsonFmt bool
 	dryRun  bool
+	cdDir   string
+	yes     bool
+	jobs    int
 )
 
 var rootCmd = &cobra.Command{
 	Use:   "unigo",
 	Short: "UniGo is a Golang template hello world application",
 	Long:  `A fast and flexible Golang template referencing UniRTM and helloworld.`,
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		// Initialize the global logger before any command runs
-		logger.Init(debug, quiet, jsonFmt)
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		// Change directory if --cd is provided
+		if cdDir != "" {
+			if err := os.Chdir(cdDir); err != nil {
+				return fmt.Errorf("failed to change directory to %s: %w", cdDir, err)
+			}
+		}
+
+		// Initialize the global logger before any command runs.
+		// If --verbose is set, treat it as --debug
+		logger.Init(debug || verbose, quiet, jsonFmt)
+		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		hello.PrintHello()
@@ -35,10 +48,14 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file path")
+	rootCmd.PersistentFlags().StringVarP(&cdDir, "cd", "C", "", "change directory before running command")
 	rootCmd.PersistentFlags().BoolVarP(&quiet, "quiet", "q", false, "enable quiet mode (minimal output)")
 	rootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "enable verbose debug logging")
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "V", false, "enable verbose output (alias for --debug)")
 	rootCmd.PersistentFlags().BoolVarP(&jsonFmt, "json", "j", false, "enable JSON output format")
+	rootCmd.PersistentFlags().BoolVarP(&yes, "yes", "y", false, "answer yes to all confirmation prompts")
 	rootCmd.PersistentFlags().BoolVar(&dryRun, "dry-run", false, "show what would happen without making changes")
+	rootCmd.PersistentFlags().IntVar(&jobs, "jobs", 8, "how many jobs to run in parallel")
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
