@@ -6,6 +6,7 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 )
 
@@ -115,6 +116,10 @@ func TestLoadInvalidYAML(t *testing.T) {
 }
 
 func TestLoadUnreadableConfig(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Windows does not support Unix-style file permissions for testing unreadable files")
+	}
+
 	tmpDir, _ := os.MkdirTemp("", "unigo_config_test")
 	defer os.RemoveAll(tmpDir)
 	os.Setenv("UNIGO_CONFIG_DIR", tmpDir)
