@@ -35,8 +35,12 @@ func CompressFiles(w io.Writer, format Format, files map[string][]byte) error {
 		return writeCompressedTar(w, files, func(tw io.Writer) (io.WriteCloser, error) {
 			return lz4.NewWriter(tw), nil
 		})
+	case FormatXz:
+		return writeCompressedTar(w, files, func(tw io.Writer) (io.WriteCloser, error) {
+			return xz.NewWriter(tw)
+		})
 	default:
-		// bzip2 and xz compression are complex or lacking pure standard Go implementations for writing.
+		// bzip2 compression lacks a pure standard Go implementation for writing.
 		// For simplicity, we limit creation to highly utilized and performant formats.
 		return fmt.Errorf("%w: %s is not supported for compression yet", ErrUnsupportedFormat, format)
 	}
