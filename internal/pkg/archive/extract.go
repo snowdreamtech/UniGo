@@ -136,7 +136,12 @@ func ExtractArchive(archiveData []byte, destDir string) error {
 
 	if format == FormatRaw {
 		// Just write the raw file
-		return writeToFile(filepath.Join(destDir, "data.bin"), bytes.NewReader(archiveData), 0644)
+		path := filepath.Join(destDir, "data.bin")
+		if err := writeToFile(path, bytes.NewReader(archiveData)); err != nil {
+			return err
+		}
+		// Try to give it executable permissions by default if it's a raw binary
+		return os.Chmod(path, 0755)
 	}
 
 	tr := tar.NewReader(decompressed)
@@ -148,7 +153,11 @@ func ExtractArchive(archiveData []byte, destDir string) error {
 		if err != nil {
 			// If not a tar, treat it as a single compressed file
 			decompressedAgain, _ := NewDecompressReader(bytes.NewReader(archiveData), format)
-			return writeToFile(filepath.Join(destDir, "data.bin"), decompressedAgain, 0644)
+			path := filepath.Join(destDir, "data.bin")
+			if err := writeToFile(path, decompressedAgain); err != nil {
+				return err
+			}
+			return os.Chmod(path, 0755)
 		}
 		if err := extractTarFile(tr, hdr, destDir); err != nil {
 			return err
@@ -172,22 +181,46 @@ func extractZipFile(f *zip.File, destDir string) error {
 	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
 		return err
 	}
-	return writeToFile(path, rc, f.Mode())
+	if err := writeToFile(path, rc); err != nil {
+		return err
+	}
+
+	// Preserve permissions and modified time
+	if err := os.Chmod(path, f.Mode()); err != nil {
+		return fmt.Errorf("failed to chmod: %w", err)
+	}
+	if err := os.Chtimes(path, f.Modified, f.Modified); err != nil {
+		return fmt.Errorf("failed to chtimes: %w", err)
+	}
+	return nil
 }
 
 func extractTarFile(tr *tar.Reader, hdr *tar.Header, destDir string) error {
 	path := filepath.Join(destDir, hdr.Name)
+	mode := os.FileMode(hdr.Mode)
+
 	if hdr.FileInfo().IsDir() {
-		return os.MkdirAll(path, os.FileMode(hdr.Mode))
+		return os.MkdirAll(path, mode)
 	}
 	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
 		return err
 	}
-	return writeToFile(path, tr, os.FileMode(hdr.Mode))
+	if err := writeToFile(path, tr); err != nil {
+		return err
+	}
+
+	// Preserve permissions and modified time
+	if err := os.Chmod(path, mode); err != nil {
+		return fmt.Errorf("failed to chmod: %w", err)
+	}
+	if err := os.Chtimes(path, hdr.AccessTime, hdr.ModTime); err != nil {
+		return fmt.Errorf("failed to chtimes: %w", err)
+	}
+	return nil
 }
 
-func writeToFile(path string, r io.Reader, mode os.FileMode) error {
-	out, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, mode)
+func writeToFile(path string, r io.Reader) error {
+	out, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666) // Actual mode set by Chmod later
 	if err != nil {
 		return err
 	}

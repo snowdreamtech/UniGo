@@ -52,10 +52,11 @@ func writeZip(w io.Writer, files map[string]FileEntry) error {
 	defer zw.Close()
 
 	for name, entry := range files {
-		// Use CreateHeader to preserve file mode
+		// Use CreateHeader to preserve file mode and modification time
 		hdr := &zip.FileHeader{
-			Name:   name,
-			Method: zip.Deflate,
+			Name:     name,
+			Method:   zip.Deflate,
+			Modified: entry.ModTime,
 		}
 		hdr.SetMode(entry.Mode)
 
@@ -76,9 +77,10 @@ func writeTar(w io.Writer, files map[string]FileEntry) error {
 
 	for name, entry := range files {
 		hdr := &tar.Header{
-			Name: name,
-			Mode: int64(entry.Mode),
-			Size: int64(len(entry.Data)),
+			Name:    name,
+			Mode:    int64(entry.Mode),
+			Size:    int64(len(entry.Data)),
+			ModTime: entry.ModTime,
 		}
 		if err := tw.WriteHeader(hdr); err != nil {
 			return fmt.Errorf("failed to write tar header for %s: %w", name, err)

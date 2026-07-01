@@ -6,6 +6,7 @@ package archive
 import (
 	"fmt"
 	"os"
+	"time"
 )
 
 // Format represents an archive or compression format.
@@ -79,6 +80,7 @@ var (
 
 // FileEntry represents a file to be added to an archive.
 type FileEntry struct {
-	Data []byte
-	Mode os.FileMode
+	Data    []byte
+	Mode    os.FileMode
+	ModTime time.Time
 }
