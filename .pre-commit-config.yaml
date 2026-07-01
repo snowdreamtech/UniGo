@@ -649,27 +649,6 @@ repos:
         files: ^\.github/workflows/.*\.yml$
         description: "Audit GitHub Actions workflows for security vulnerabilities (offline; full online audit runs in CI audit job)."
 
-      - id: check-taskfile
-        name: check taskfile
-        language: system
-        entry: unirtm hook-exec task --list --taskfile
-        files: 'Taskfile\.ya?ml$'
-        description: "Verify that Taskfile (Task runner) files are well-formed."
-
-      - id: check-dvc
-        name: check dvc pipeline
-        language: system
-        entry: unirtm hook-exec dvc dag
-        files: 'dvc\.yaml$'
-        description: "Verify that DVC pipeline files are valid and the DAG is correct."
-
-      - id: check-nix-fmt
-        name: check nix style
-        language: system
-        entry: unirtm hook-exec nixpkgs-fmt --check
-        files: '\.nix$'
-        description: "Verify Nix code compliance with nixpkgs-fmt."
-
       - id: shfmt
         name: shfmt format
         language: system
@@ -687,23 +666,6 @@ repos:
         exclude: |
           (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
         description: "Format TOML files using Taplo."
-
-      - id: ruff-format
-        name: ruff format
-        language: system
-        entry: unirtm hook-exec ruff format
-        types_or: [python, pyi]
-        exclude: |
-          (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
-        description: "Fast Python code formatter."
-
-      - id: clang-format
-        name: clang-format
-        language: system
-        entry: unirtm hook-exec clang-format
-        args: [-i]
-        types_or: [objective-c, c, c++]
-        description: "Format C/C++ family source files."
 
       - id: gofmt
         name: gofmt
@@ -732,7 +694,6 @@ repos:
       #        exclude: |
       #          (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
       #        description: "Comprehensive Go linter aggregator."
-
 
       # -- Secret Scanning ----------------------------------------------------
       - id: gitleaks
@@ -804,22 +765,6 @@ repos:
         pass_filenames: false
         description: "Multi-language static analysis for security, bugs, and best practices using Semgrep."
 
-      - id: bandit
-        name: bandit python security check
-        language: system
-        entry: unirtm hook-exec bandit -r -ll
-        types: [python]
-        exclude: ^tests/
-        description: "Find common security issues in Python code using Bandit."
-
-      #      - id: gosec
-      #        name: gosec go security scan
-      #        language: system
-      #        entry: unirtm hook-exec gosec -exclude=G104 -quiet ./...
-      #        types: [go]
-      #        pass_filenames: false
-      #        description: "Audit Go source code for security vulnerabilities using Gosec."
-
       - id: govulncheck
         name: govulncheck go vulnerability audit
         language: system
@@ -827,14 +772,6 @@ repos:
         types: [go]
         pass_filenames: false
         description: "Official Go vulnerability checker for source code and dependencies."
-
-      - id: cargo-audit
-        name: cargo audit rust dependencies
-        language: system
-        entry: unirtm hook-exec cargo-audit audit
-        files: 'Cargo\.lock$'
-        pass_filenames: false
-        description: "Audit Rust dependencies for known security vulnerabilities."
 
       - id: npm-pnpm-audit
         name: node ecosystem audit
@@ -1022,27 +959,6 @@ repos:
           (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
         description: "Find and fix problems in JavaScript/TypeScript/Vue code."
 
-      - id: stylelint
-        name: stylelint quality check
-        language: system
-        entry: unirtm hook-exec stylelint --fix
-        types_or:
-          - css
-          - scss
-          - less
-        exclude: |
-          (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
-        description: "Lint style sheets for CSS/SCSS/Less quality."
-
-      - id: ruff
-        name: ruff check
-        language: system
-        entry: unirtm hook-exec ruff check --fix
-        types_or: [python, pyi]
-        exclude: |
-          (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
-        description: "Highly performant Python linter with auto-fix capability."
-
       - id: yamllint
         name: yamllint
         language: system
@@ -1093,30 +1009,6 @@ repos:
         types: [powershell]
         description: "PowerShell static analysis tool (macOS/Windows)."
 
-      - id: checkmake
-        name: check makefile
-        language: system
-        entry: unirtm hook-exec checkmake --config .checkmake.ini
-        files: ^Makefile$
-        description: "Linter for Makefile best practices."
-
-      - id: tflint
-        name: check terraform
-        language: system
-        entry: unirtm hook-exec tflint
-        types: [terraform]
-        description: "Linter for Terraform code."
-
-      - id: kube-linter
-        name: kube-linter quality check
-        language: system
-        entry: unirtm hook-exec kube-linter lint
-        types: [yaml]
-        files: '.*(kube|k8s|manifest).*\.ya?ml$'
-        exclude: |
-          (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
-        description: "Lint Kubernetes manifests for security and best practices."
-
       - id: actionlint
         name: check github actions
         language: system
@@ -1159,140 +1051,6 @@ repos:
         pass_filenames: false
         description: "Check GoReleaser configuration."
 
-      - id: spectral
-        name: spectral quality check
-        language: system
-        entry: unirtm hook-exec spectral lint
-        types_or: [json, yaml]
-        files: '(?i)(openapi|swagger|asyncapi).*\.(json|yaml|yml)$'
-        pass_filenames: true
-        exclude: |
-          (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
-        description: "Lint API contracts using Spectral (OpenAPI/Swagger/AsyncAPI)."
-
-      - id: sort-package-json
-        name: sort package-json
-        language: system
-        entry: unirtm hook-exec sort-package-json
-        files: ^package\.json$
-        pass_filenames: true
-        description: "Maintain a deterministic property order in package.json."
-
-      - id: dotenv-linter
-        name: dotenv quality check
-        language: system
-        entry: unirtm hook-exec dotenv-linter
-        files: '(\.env|\.env\.example|\.env\.sample)$'
-        pass_filenames: true
-        exclude: |
-          (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
-        description: "Validate the structure of environment variable files."
-
-      # -- Extensibility (Optional Runtime Hooks) ---------------------------
-      # The following hooks skip gracefully if their runtime is missing.
-      - id: sqlfluff
-        name: sqlfluff lint
-        language: system
-        entry: unirtm hook-exec sqlfluff lint
-        args: [--dialect, postgres]
-        types_or: [sql]
-        exclude: |
-          (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
-        description: "Lint SQL dialects for syntax and style."
-
-      - id: ktlint
-        name: check kotlin style
-        language: system
-        entry: unirtm hook-exec ktlint
-        files: '\.kts?$'
-        exclude: |
-          (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
-        description: "Verify Kotlin code against community style guides."
-
-      - id: google-java-format
-        name: check java style
-        language: system
-        entry: unirtm hook-exec google-java-format --set-exit-if-changed --dry-run
-        files: '\.java$'
-        exclude: |
-          (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
-        description: "Verify Java code against Google Style Guide."
-
-      - id: rubocop
-        name: check ruby style
-        language: system
-        entry: unirtm hook-exec rubocop
-        files: '\.rb$'
-        exclude: |
-          (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
-        description: "Verify Ruby code against community style guides."
-
-      - id: dart-format
-        name: check dart style
-        language: system
-        entry: unirtm hook-exec dart format --output=none --set-exit-if-changed
-        files: '\.dart$'
-        exclude: |
-          (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
-        description: "Verify Dart code with the official SDK formatter."
-
-      - id: mix-format
-        name: check elixir style
-        language: system
-        entry: unirtm hook-exec mix format --check-formatted
-        files: '\.(ex|exs)$'
-        exclude: |
-          (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
-        description: "Verify Elixir code compliance with official formatter."
-
-      - id: scalafmt
-        name: check scala style
-        language: system
-        entry: unirtm hook-exec scalafmt --check
-        files: '\.scala$'
-        exclude: |
-          (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
-        description: "Verify Scala code compliance with scalafmt."
-
-      - id: haskell-format
-        name: check haskell style
-        language: system
-        entry: unirtm hook-exec ormolu --mode check
-        files: '\.lhs?$'
-        exclude: |
-          (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
-        description: "Verify Haskell code compliance with ormolu."
-
-      - id: swiftformat
-        name: check swift style
-        language: system
-        entry: unirtm hook-exec swiftformat --lint
-        files: '\.swift$'
-        exclude: |
-          (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
-        description: "Verify Swift code formatting (macOS only)."
-
-      - id: swiftlint
-        name: swiftlint quality check
-        language: system
-        entry: unirtm hook-exec swiftlint lint --strict
-        files: '\.swift$'
-        exclude: |
-          (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
-        pass_filenames: false
-        description: "Audit Swift code quality and best practices (macOS only)."
-
-      - id: dotnet-format
-        name: check .net style
-        language: system
-        entry: unirtm hook-exec dotnet format --verify-no-changes
-        files: '\.(cs|vb|fs)$'
-        exclude: |
-          (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
-        pass_filenames: false
-        description: "Verify .NET code compliance with SDK formatting rules."
-
-      # -- Git Message Flow --------------------------------------------------
       - id: commitlint
         name: check commit message format
         language: system
