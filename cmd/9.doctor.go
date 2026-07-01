@@ -6,9 +6,12 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
+	"time"
 
 	"github.com/pterm/pterm"
 	"github.com/snowdreamtech/unigo/internal/cli/output"
@@ -112,6 +115,41 @@ func runDoctor(cmd *cobra.Command, args []string) error {
 		} else {
 			output.Warningf("Current dir: %s (Read-only or restricted: %v)", wd, err)
 			suggestions++
+		}
+	}
+
+	// GOROOT Check
+	if goroot := os.Getenv("GOROOT"); goroot != "" {
+		output.Warningf("GOROOT is explicitly set to %s", pterm.FgGray.Sprint(goroot))
+		output.Info("  This often breaks dynamic version switching. It is recommended to unset it.")
+		suggestions++
+	} else {
+		output.Success("GOROOT is not explicitly set (Good)")
+	}
+
+
+	// GOPROXY Check
+	goproxy := os.Getenv("GOPROXY")
+	if goproxy == "" {
+		goproxy = "https://proxy.golang.org,direct"
+	}
+	proxies := strings.Split(goproxy, ",")
+	firstProxy := proxies[0]
+	if firstProxy == "direct" || firstProxy == "off" {
+		output.Successf("GOPROXY is set to %s", firstProxy)
+	} else {
+		proxyURL := strings.TrimRight(firstProxy, "/")
+		ctxTimeout, cancel := context.WithTimeout(ctx, 3*time.Second)
+		req, _ := http.NewRequestWithContext(ctxTimeout, http.MethodGet, proxyURL, nil)
+		resp, err := http.DefaultClient.Do(req)
+		cancel()
+		if err != nil {
+			output.Warningf("GOPROXY (%s) seems unreachable: %v", proxyURL, err)
+			output.Info("  Consider setting GOPROXY=https://goproxy.cn,direct if you are in a restricted network")
+			suggestions++
+		} else {
+			resp.Body.Close()
+			output.Successf("GOPROXY (%s) is reachable", proxyURL)
 		}
 	}
 
