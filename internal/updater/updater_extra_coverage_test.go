@@ -138,7 +138,7 @@ func TestCheckUpdateAsync(t *testing.T) {
 
 	// Clear cache to simulate first check
 	ClearCache()
-	
+
 	// Fast track CheckUpdateAsync by mocking the server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		info := ReleaseInfo{TagName: "v2.0.0"}

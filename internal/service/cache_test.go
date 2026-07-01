@@ -55,7 +55,7 @@ func (m *MockAuditRepository) Log(ctx context.Context, entry *repository.AuditEn
 	if len(m.ExpectedCalls) == 0 {
 		return nil
 	}
-	
+
 	// Check if this specific method is mocked
 	mocked := false
 	for _, call := range m.ExpectedCalls {

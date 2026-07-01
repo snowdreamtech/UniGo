@@ -93,7 +93,7 @@ func TestLoadInvalidTOML(t *testing.T) {
 	defer os.Unsetenv("UNIGO_CONFIG_DIR")
 
 	os.WriteFile(filepath.Join(tmpDir, "unigo.toml"), []byte(`[invalid`), 0644)
-	
+
 	_, err := Load()
 	if err == nil {
 		t.Errorf("Expected error when parsing invalid TOML")
@@ -107,7 +107,7 @@ func TestLoadInvalidYAML(t *testing.T) {
 	defer os.Unsetenv("UNIGO_CONFIG_DIR")
 
 	os.WriteFile(filepath.Join(tmpDir, "unigo.yaml"), []byte(`invalid: yaml: :`), 0644)
-	
+
 	_, err := Load()
 	if err == nil {
 		t.Errorf("Expected error when parsing invalid YAML")
@@ -122,7 +122,7 @@ func TestLoadUnreadableConfig(t *testing.T) {
 
 	file := filepath.Join(tmpDir, "unigo.toml")
 	os.WriteFile(file, []byte(`debug = true`), 0200) // write-only
-	
+
 	_, err := Load()
 	if err == nil {
 		t.Errorf("Expected error when reading unreadable file")
@@ -136,7 +136,7 @@ func TestSaveMkdirError(t *testing.T) {
 	// Create a file where the config dir should be
 	badDir := filepath.Join(tmpDir, "bad_dir")
 	os.WriteFile(badDir, []byte("file"), 0644)
-	
+
 	os.Setenv("UNIGO_CONFIG_DIR", badDir)
 	defer os.Unsetenv("UNIGO_CONFIG_DIR")
 

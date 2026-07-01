@@ -29,11 +29,12 @@ import (
 	"golang.org/x/crypto/blake2s"
 	"golang.org/x/crypto/sha3"
 
+	"log/slog"
+
 	"github.com/snowdreamtech/unigo/internal/pkg/env"
 	"github.com/snowdreamtech/unigo/internal/pkg/errors"
 	"github.com/snowdreamtech/unigo/internal/pkg/gpg"
 	pkgHttp "github.com/snowdreamtech/unigo/internal/pkg/http"
-	"log/slog"
 )
 
 // ErrGPGSkipped is returned when a signature file is not found (404) and verification is skipped.

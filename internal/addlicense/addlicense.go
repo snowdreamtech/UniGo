@@ -23,12 +23,12 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil" //nolint:staticcheck // ioutil kept for parity with upstream
+	"log/slog"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"text/template"
-	"log/slog"
 
 	doublestar "github.com/bmatcuk/doublestar/v4"
 	"golang.org/x/sync/errgroup"

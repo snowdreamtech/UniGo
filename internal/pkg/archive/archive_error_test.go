@@ -1,3 +1,6 @@
+// Copyright (c) 2026 SnowdreamTech. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
 package archive
 
 import (
@@ -39,14 +42,14 @@ func TestCompressFiles_Errors(t *testing.T) {
 	files := map[string]FileEntry{
 		"test": {Data: []byte("a")},
 	}
-	
+
 	err := CompressFiles(nil, Format("unsupported"), files)
 	assert.Error(t, err)
 }
 
 func TestExtractTarFile_MkdirError(t *testing.T) {
 	tempDir := t.TempDir()
-	
+
 	// Create a file where a directory needs to be
 	err := os.WriteFile(filepath.Join(tempDir, "mydir"), []byte("file"), 0644)
 	require.NoError(t, err)
@@ -70,7 +73,7 @@ func TestExtractTarFile_MkdirError(t *testing.T) {
 
 func TestExtractZipFile_MkdirError(t *testing.T) {
 	tempDir := t.TempDir()
-	
+
 	// Create a file where a directory needs to be
 	err := os.WriteFile(filepath.Join(tempDir, "mydir"), []byte("file"), 0644)
 	require.NoError(t, err)

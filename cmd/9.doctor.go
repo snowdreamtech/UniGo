@@ -127,7 +127,6 @@ func runDoctor(cmd *cobra.Command, args []string) error {
 		output.Success("GOROOT is not explicitly set (Good)")
 	}
 
-
 	// GOPROXY Check
 	goproxy := os.Getenv("GOPROXY")
 	if goproxy == "" {

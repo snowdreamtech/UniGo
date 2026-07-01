@@ -230,10 +230,10 @@ func TestTransaction_Errors(t *testing.T) {
 	// 1. Begin success, test Commit and Rollback errors by double calling
 	tx, err := tm.Begin(ctx)
 	require.NoError(t, err)
-	
+
 	err = tx.Commit()
 	require.NoError(t, err)
-	
+
 	// Double commit should error
 	err = tx.Commit()
 	require.Error(t, err)
