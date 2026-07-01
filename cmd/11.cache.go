@@ -4,9 +4,11 @@
 package cmd
 
 import (
-	"fmt"
 	"log/slog"
+	"os"
 
+	"github.com/pterm/pterm"
+	"github.com/snowdreamtech/unigo/internal/pkg/env"
 	"github.com/spf13/cobra"
 )
 
@@ -28,8 +30,14 @@ var cacheClearCmd = &cobra.Command{
 	Short: "Clear all cached data",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		slog.Debug("Clearing cache...")
-		// Future implementation: call env.GetCacheDir() and os.RemoveAll()
-		fmt.Println("Placeholder: Cache cleared successfully.")
+		
+		cacheDir := env.GetCacheDir()
+		if err := os.RemoveAll(cacheDir); err != nil {
+			pterm.Error.Printf("Failed to clear cache at %s: %v\n", cacheDir, err)
+			return err
+		}
+		
+		pterm.Success.Printf("Cache cleared successfully at %s\n", cacheDir)
 		return nil
 	},
 }

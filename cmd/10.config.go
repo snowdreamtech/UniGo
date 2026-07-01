@@ -4,9 +4,14 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"log/slog"
+	"os"
+	"path/filepath"
 
+	"github.com/pterm/pterm"
+	"github.com/snowdreamtech/unigo/internal/pkg/env"
 	"github.com/spf13/cobra"
 )
 
@@ -16,6 +21,35 @@ func init() {
 		configCmd.AddCommand(configGetCmd)
 		configCmd.AddCommand(configSetCmd)
 	}
+}
+
+func getConfigPath() string {
+	return filepath.Join(env.GetConfigDir(), "config.json")
+}
+
+func loadConfig() map[string]string {
+	path := getConfigPath()
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return make(map[string]string)
+	}
+	var conf map[string]string
+	if err := json.Unmarshal(data, &conf); err != nil {
+		return make(map[string]string)
+	}
+	return conf
+}
+
+func saveConfig(conf map[string]string) error {
+	path := getConfigPath()
+	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+		return err
+	}
+	data, err := json.MarshalIndent(conf, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(path, data, 0644)
 }
 
 var configCmd = &cobra.Command{
@@ -31,7 +65,13 @@ var configGetCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		key := args[0]
 		slog.Debug("Getting config value", "key", key)
-		fmt.Printf("Placeholder: Getting value for '%s'\n", key)
+		
+		conf := loadConfig()
+		if val, ok := conf[key]; ok {
+			fmt.Println(val)
+		} else {
+			pterm.Warning.Printf("Key '%s' not found in configuration\n", key)
+		}
 		return nil
 	},
 }
@@ -44,7 +84,15 @@ var configSetCmd = &cobra.Command{
 		key := args[0]
 		val := args[1]
 		slog.Debug("Setting config value", "key", key, "value", val)
-		fmt.Printf("Placeholder: Setting '%s' to '%s'\n", key, val)
+		
+		conf := loadConfig()
+		conf[key] = val
+		if err := saveConfig(conf); err != nil {
+			pterm.Error.Printf("Failed to save configuration: %v\n", err)
+			return err
+		}
+		
+		pterm.Success.Printf("Set '%s' to '%s'\n", key, val)
 		return nil
 	},
 }
