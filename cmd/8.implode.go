@@ -16,12 +16,10 @@ import (
 )
 
 var (
-	implodeYes    bool
 	implodeConfig bool
 )
 
 func init() {
-	implodeCmd.Flags().BoolVarP(&implodeYes, "yes", "y", false, "skip confirmation prompt")
 	implodeCmd.Flags().BoolVar(&implodeConfig, "config", false, "also remove configuration directory (~/.config/unigo)")
 
 	if rootCmd != nil {
@@ -70,7 +68,7 @@ func runImplode(cmd *cobra.Command, args []string) error {
 	}
 
 	// 2. Confirmation
-	if !implodeYes {
+	if !yes {
 		pterm.Warning.Prefix = pterm.Prefix{Text: "WARNING", Style: pterm.NewStyle(pterm.BgRed, pterm.FgWhite)}
 		pterm.Warning.Println("This will permanently destroy ALL UniGo data.")
 		fmt.Printf("\nSelected Targets:\n")

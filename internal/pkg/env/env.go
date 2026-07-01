@@ -72,12 +72,6 @@ var (
 	// Cwd specifies the current working directory for the application.
 	Cwd string
 
-	// Jobs specifies the number of parallel jobs to run.
-	Jobs int
-
-	// Yes indicates whether to automatically answer yes to all confirmation prompts.
-	Yes bool
-
 	// Silent indicates whether to suppress all output and non-error messages.
 	Silent bool
 

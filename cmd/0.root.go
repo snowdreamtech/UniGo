@@ -17,16 +17,12 @@ import (
 )
 
 var (
-	cfgFile     string
 	quiet       bool
 	silent      bool
-	noConfig    bool
 	verbose     bool
 	jsonOutput  bool
-	dryRun      bool
 	cdDir       string
 	yes         bool
-	jobs        int
 	showVersion bool
 )
 
@@ -73,11 +69,7 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&cdDir, "cd", "C", "", "change directory before running command")
-	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file path (default: .unigo.toml or unigo.toml)")
-	rootCmd.PersistentFlags().BoolVar(&dryRun, "dry-run", false, "show what would happen without making changes")
-	rootCmd.PersistentFlags().IntVar(&jobs, "jobs", 8, "how many jobs to run in parallel")
 	rootCmd.PersistentFlags().BoolVarP(&jsonOutput, "json", "j", false, "enable JSON output format")
-	rootCmd.PersistentFlags().BoolVar(&noConfig, "no-config", false, "do not load any config files")
 	rootCmd.PersistentFlags().BoolVarP(&quiet, "quiet", "q", false, "enable quiet mode (minimal output)")
 	rootCmd.PersistentFlags().BoolVar(&silent, "silent", false, "suppress all task output and non-error messages")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "V", false, "enable verbose output (debug logging)")
