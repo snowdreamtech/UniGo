@@ -112,7 +112,7 @@ type ReleaseInfo struct {
 
 // FetchLatestReleaseInfo fetches the latest release information from GitHub API.
 func FetchLatestReleaseInfo(ctx context.Context) (*ReleaseInfo, error) {
-	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, githubAPIURL, nil)
@@ -125,15 +125,30 @@ func FetchLatestReleaseInfo(ctx context.Context) (*ReleaseInfo, error) {
 	// Relies on default transport which respects HTTP_PROXY/HTTPS_PROXY env vars.
 	client := &http.Client{}
 
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
+	var resp *http.Response
+	var fetchErr error
+	for i := 0; i < 3; i++ {
+		resp, fetchErr = client.Do(req)
+		if fetchErr == nil && resp.StatusCode == http.StatusOK {
+			break
+		}
+		if resp != nil {
+			resp.Body.Close()
+		}
+		// Wait a bit before retrying, unless context is cancelled
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		case <-time.After(time.Duration(i+1) * time.Second):
+		}
+	}
+	if fetchErr != nil {
+		return nil, fmt.Errorf("failed after 3 attempts: %w", fetchErr)
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code after 3 attempts: %d", resp.StatusCode)
 	}
 	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
-	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -169,7 +184,7 @@ func CheckUpdateAsync(currentVersion string) {
 			return
 		}
 
-		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
 		releaseInfo, err := FetchLatestReleaseInfo(ctx)

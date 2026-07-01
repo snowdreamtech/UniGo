@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/snowdreamtech/unigo/internal/pkg/archive"
 	"github.com/snowdreamtech/unigo/internal/pkg/env"
@@ -92,19 +93,9 @@ func runSelfUpdate(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("checksums.txt not found in release assets")
 		}
 		fmt.Printf("Downloading checksums...\n")
-		chkReq, err := http.NewRequestWithContext(ctx, http.MethodGet, checksumsURL, nil)
-		if err != nil {
-			return fmt.Errorf("failed to create checksum request: %w", err)
-		}
-		chkResp, err := http.DefaultClient.Do(chkReq)
+		chkBody, err := downloadWithRetry(ctx, checksumsURL)
 		if err != nil {
 			return fmt.Errorf("failed to download checksums: %w", err)
-		}
-		defer chkResp.Body.Close()
-
-		chkBody, err := io.ReadAll(chkResp.Body)
-		if err != nil {
-			return fmt.Errorf("failed to read checksums: %w", err)
 		}
 
 		// Find the hash for our assetName
@@ -126,19 +117,9 @@ func runSelfUpdate(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Printf("Downloading %s...\n", downloadURL)
-	dlReq, err := http.NewRequestWithContext(ctx, http.MethodGet, downloadURL, nil)
+	archiveData, err := downloadWithRetry(ctx, downloadURL)
 	if err != nil {
-		return fmt.Errorf("failed to create download request: %w", err)
-	}
-	dlResp, err := http.DefaultClient.Do(dlReq)
-	if err != nil {
-		return fmt.Errorf("download failed: %w", err)
-	}
-	defer dlResp.Body.Close()
-
-	archiveData, err := io.ReadAll(dlResp.Body)
-	if err != nil {
-		return fmt.Errorf("failed to read downloaded archive: %w", err)
+		return fmt.Errorf("failed to download archive: %w", err)
 	}
 
 	if !skipChecksum {
@@ -185,9 +166,23 @@ func runSelfUpdate(cmd *cobra.Command, args []string) error {
 	}
 	tmpFile.Close()
 
+	// Clean up any legacy .old files before attempting update
+	oldPath := execPath + ".old"
+	_ = os.Remove(oldPath)
+
 	// Atomically replace the current binary
-	if err := os.Rename(tmpPath, execPath); err != nil {
+	err = os.Rename(tmpPath, execPath)
+	if err != nil {
+		// Fallback for Windows where running executables cannot be overwritten directly
+		if renameErr := os.Rename(execPath, oldPath); renameErr == nil {
+			err = os.Rename(tmpPath, execPath)
+		}
+	}
+
+	if err != nil {
 		os.Remove(tmpPath)
+		// Try to restore old if we moved it but new failed
+		_ = os.Rename(oldPath, execPath)
 		return fmt.Errorf("failed to replace binary: %w", err)
 	}
 
@@ -196,4 +191,39 @@ func runSelfUpdate(cmd *cobra.Command, args []string) error {
 
 	fmt.Printf("Successfully updated to version %s!\n", latestVer)
 	return nil
+}
+
+// downloadWithRetry attempts to download a URL with up to 3 retries.
+func downloadWithRetry(ctx context.Context, url string) ([]byte, error) {
+	var respData []byte
+	var lastErr error
+
+	for i := 0; i < 3; i++ {
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create request: %w", err)
+		}
+
+		resp, err := http.DefaultClient.Do(req)
+		if err == nil && resp.StatusCode == http.StatusOK {
+			defer resp.Body.Close()
+			respData, lastErr = io.ReadAll(resp.Body)
+			if lastErr == nil {
+				return respData, nil
+			}
+		} else if err == nil {
+			resp.Body.Close()
+			lastErr = fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		} else {
+			lastErr = err
+		}
+
+		// Wait before retry
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		case <-time.After(time.Duration(i+1) * time.Second):
+		}
+	}
+	return nil, fmt.Errorf("download failed after 3 attempts: %w", lastErr)
 }
