@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM snowdreamtech/golang:1.24.2-debian AS builder
+FROM --platform=$BUILDPLATFORM snowdreamtech/golang:1.26.4-debian AS builder
 
 ARG TARGETOS
 ARG TARGETARCH
