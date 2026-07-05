@@ -28,17 +28,17 @@ var manpageCmd = &cobra.Command{
 		if err := os.MkdirAll(manpageDir, 0755); err != nil {
 			return fmt.Errorf("failed to create directory: %w", err)
 		}
-		
+
 		header := &doc.GenManHeader{
 			Title:   "UNIGO",
 			Section: "1",
 		}
-		
+
 		err := doc.GenManTree(rootCmd, header, manpageDir)
 		if err != nil {
 			return fmt.Errorf("failed to generate manpages: %w", err)
 		}
-		
+
 		return nil
 	},
 }
