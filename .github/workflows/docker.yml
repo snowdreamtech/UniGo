@@ -65,21 +65,27 @@ jobs:
       matrix:
         include:
           - variant: alpine
-            version: "3.24.0"
+            # x-release-please-start-version
+            version: "0.0.4"
+            # x-release-please-end
             file: docker/alpine/Dockerfile
             platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/riscv64,linux/s390x
             is_latest: false
             package_manager: apk
 
           - variant: debian
-            version: "13.5.0"
+            # x-release-please-start-version
+            version: "0.0.4"
+            # x-release-please-end
             file: docker/debian/Dockerfile
             platforms: linux/386,linux/amd64,linux/arm/v5,linux/arm/v7,linux/arm64,linux/riscv64,linux/ppc64le,linux/s390x
             is_latest: true
             package_manager: apt-get
 
           - variant: rocky
-            version: "10.2.0"
+            # x-release-please-start-version
+            version: "0.0.4"
+            # x-release-please-end
             file: docker/rocky/Dockerfile
             platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x
             is_latest: false
@@ -311,7 +317,7 @@ jobs:
           file: ${{ matrix.file }}
           build-args: |
             BUILDTIME=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
-            VERSION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
+            VERSION=${{ matrix.version }}
             REVISION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
           platforms: ${{ matrix.platforms }}
           provenance: true
