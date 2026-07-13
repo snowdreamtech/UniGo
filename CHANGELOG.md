@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.0.4](https://github.com/snowdreamtech/UniGo/compare/v0.0.4...v0.0.4) (2026-07-13)
+
+
+### 🛠 Refactoring
+
+* switch Go download mirror to go.dev, remove harden-runner from GitHub workflows, and update vite to 8.1.3 ([5b38466](https://github.com/snowdreamtech/UniGo/commit/5b38466b3736724dd1a7d1cdbb737b69561fe183))
+
+
+### ♻️ Miscellaneous Chores
+
+* add egress network allowlist entries to all GitHub Actions workflows ([9616592](https://github.com/snowdreamtech/UniGo/commit/961659274a02544704ba1a9e22327d70b11fb109))
+* **deps:** bump vite in /docs in the all-dependencies group ([f3e5f8f](https://github.com/snowdreamtech/UniGo/commit/f3e5f8fbf6c7bc524b70caccf8aa20eea3bbd4e7))
+* **deps:** sync dependabot config and unirtm toolchain ([59628d4](https://github.com/snowdreamtech/UniGo/commit/59628d49a78c0717168d047066fffddaeda4cea2))
+* **deps:** sync dependabot config and unirtm toolchain ([5169535](https://github.com/snowdreamtech/UniGo/commit/5169535295d32ab02b3705fac84c58f3295188cc))
+* release main ([40863d5](https://github.com/snowdreamtech/UniGo/commit/40863d5425314b3ad86c556202e48981d0bf6668))
+
 ## [0.0.4](https://github.com/snowdreamtech/UniGo/compare/v0.0.4...v0.0.4) (2026-07-07)
 
 
