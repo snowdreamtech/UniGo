@@ -8,9 +8,9 @@ import (
 	"os"
 
 	"github.com/snowdreamtech/unigo/internal/cli/output"
-	"github.com/snowdreamtech/unigo/internal/hello"
 	"github.com/snowdreamtech/unigo/internal/env"
 	"github.com/snowdreamtech/unigo/internal/errors"
+	"github.com/snowdreamtech/unigo/internal/hello"
 	"github.com/snowdreamtech/unigo/internal/logger"
 	"github.com/snowdreamtech/unigo/internal/updater"
 	"github.com/spf13/cobra"
