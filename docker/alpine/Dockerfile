@@ -19,7 +19,7 @@ FROM ghcr.io/snowdreamtech/alpine:3.24.0
 
 # Build-time Configuration
 ARG BUILDTIME \
-    VERSION \
+    VERSION=0.0.6 \
     REVISION \
     KEEPALIVE=0 \
     CAP_NET_BIND_SERVICE=0 \
@@ -41,13 +41,10 @@ LABEL org.opencontainers.image.authors="Snowdream Tech" \
     org.opencontainers.image.licenses="MIT" \
     org.opencontainers.image.source="https://github.com/snowdreamtech/unigo" \
     org.opencontainers.image.vendor="Snowdream Tech" \
+    org.opencontainers.image.version="${VERSION}" \
     org.opencontainers.image.created="${BUILDTIME}" \
     org.opencontainers.image.revision="${REVISION}" \
     org.opencontainers.image.url="https://github.com/snowdreamtech/unigo"
-
-# x-release-please-start-version
-LABEL org.opencontainers.image.version="${VERSION:-0.0.6}"
-# x-release-please-end
 
 # Runtime Environment Configuration
 ENV KEEPALIVE=${KEEPALIVE} \
