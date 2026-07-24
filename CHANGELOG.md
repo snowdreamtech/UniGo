@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.8](https://github.com/snowdreamtech/UniGo/compare/v0.0.7...v0.0.8) (2026-07-24)
+
+
+### ♻️ Miscellaneous Chores
+
+* update base images to alpine 3.24.1 and debian 13.6.0 ([a1096c2](https://github.com/snowdreamtech/UniGo/commit/a1096c27797f144b45bc1ce0eefaa44c38b16a27))
+
 ## [0.0.7](https://github.com/snowdreamtech/UniGo/compare/v0.0.6...v0.0.7) (2026-07-24)
 
 
