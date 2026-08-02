@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.9](https://github.com/snowdreamtech/UniGo/compare/v0.0.8...v0.0.9) (2026-08-02)
+
+
+### 🛠 Refactoring
+
+* split GoReleaser job into core and third-party release steps to improve reliability and fault tolerance ([6e760fb](https://github.com/snowdreamtech/UniGo/commit/6e760fbecbb3c91f008b44f26c7ec69806425f88))
+
 ## [0.0.8](https://github.com/snowdreamtech/UniGo/compare/v0.0.7...v0.0.8) (2026-07-24)
 
 
