@@ -56,8 +56,7 @@ jobs:
       matrix:
         language:
           - actions
-          # Uncomment the following lines when source files exist in the repo:
-          # - go # Go (*.go) — golangci-lint, gofmt
+          - go
           # - python                # Python (*.py) — ruff, ansible-lint
           # - javascript-typescript # JS/TS (*.js, *.ts, *.jsx, *.tsx) — eslint
           # - c-cpp                 # C/C++/Obj-C (*.c, *.cpp, *.h) — clang-format
@@ -71,6 +70,13 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+
+      - name: "🐹 Setup Go Environment"
+        if: matrix.language == 'go'
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+        with:
+          go-version-file: "go.mod"
+          cache: false
 
       - name: "🛡️ Initialize CodeQL Engine"
         uses: github/codeql-action/init@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
