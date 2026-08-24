@@ -50,10 +50,10 @@ unigo install node@25.9.0
 unigo install python@3.14.3
 
 # 安装 Go
-unigo install go@1.26.2
+unigo install go@1.27.0
 
 # 激活工具
-unigo use node@25.9.0 python@3.14.3 go@1.26.2
+unigo use node@25.9.0 python@3.14.3 go@1.27.0
 ```
 
 ## 完整 Dockerfile 示例

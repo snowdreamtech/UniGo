@@ -14,7 +14,7 @@ Alpine Linux 使用 musl libc 而不是 glibc，这会影响某些预编译二�
 
 ```toml
 # .unigo.toml - 无需修改
-go = "1.26.2"
+go = "1.27.0"
 ```
 
 **验证**:
@@ -166,7 +166,7 @@ RUN unigo install
 # 生产环境配置 - 使用系统包
 # node = "25.9.0"  # 注释掉，使用 apk 安装
 # python = "3.14.3"  # 注释掉，使用 apk 安装
-# go = "1.26.2"  # 注释掉，使用 apk 安装
+# go = "1.27.0"  # 注释掉，使用 apk 安装
 
 # 开发工具仍然使用 unigo
 "github:astral-sh/ruff" = "0.15.9"
