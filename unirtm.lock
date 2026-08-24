@@ -396,40 +396,40 @@ checksum = "sha256:b95f5e4f5c425cedca7ee203d9afd29597e692c4924a12ed42f970537c72c
 url = "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_windows_arm64.zip"
 
 [[tools."github:google/osv-scanner"]]
-version = "2.3.8"
+version = "2.5.1"
 backend = "github"
 
 [tools."github:google/osv-scanner"."platforms.linux-amd64"]
-checksum = "sha256:bc98e15319ed0d515e3f9235287ba53cdc5535d576d24fd573978ecfe9ab92dc"
-url = "https://github.com/google/osv-scanner/releases/download/v2.3.8/osv-scanner_linux_amd64"
+checksum = "sha256:f9f25499a2c8cc367b3af45df2ea7eeca7fbccceab9c35079968f4b3652194be"
+url = "https://github.com/google/osv-scanner/releases/download/v2.5.1/osv-scanner_linux_amd64"
 
 [tools."github:google/osv-scanner"."platforms.linux-amd64-musl"]
-checksum = "sha256:bc98e15319ed0d515e3f9235287ba53cdc5535d576d24fd573978ecfe9ab92dc"
-url = "https://github.com/google/osv-scanner/releases/download/v2.3.8/osv-scanner_linux_amd64"
+checksum = "sha256:f9f25499a2c8cc367b3af45df2ea7eeca7fbccceab9c35079968f4b3652194be"
+url = "https://github.com/google/osv-scanner/releases/download/v2.5.1/osv-scanner_linux_amd64"
 
 [tools."github:google/osv-scanner"."platforms.linux-arm64"]
-checksum = "sha256:8158b18edd2d03b1a30d905ca91b032bc62262167be8f206c27114f08823e27c"
-url = "https://github.com/google/osv-scanner/releases/download/v2.3.8/osv-scanner_linux_arm64"
+checksum = "sha256:3d0f5aa5a6baa8eb32bcef247388e149ef6030a6634ccae6fa0d62681fb27a6d"
+url = "https://github.com/google/osv-scanner/releases/download/v2.5.1/osv-scanner_linux_arm64"
 
 [tools."github:google/osv-scanner"."platforms.linux-arm64-musl"]
-checksum = "sha256:8158b18edd2d03b1a30d905ca91b032bc62262167be8f206c27114f08823e27c"
-url = "https://github.com/google/osv-scanner/releases/download/v2.3.8/osv-scanner_linux_arm64"
+checksum = "sha256:3d0f5aa5a6baa8eb32bcef247388e149ef6030a6634ccae6fa0d62681fb27a6d"
+url = "https://github.com/google/osv-scanner/releases/download/v2.5.1/osv-scanner_linux_arm64"
 
 [tools."github:google/osv-scanner"."platforms.macos-amd64"]
-checksum = "sha256:b8a80a9f14ca4c0cd0fc2d351b28f740da9e6a5b18385ac9f9d083360b5b504e"
-url = "https://github.com/google/osv-scanner/releases/download/v2.3.8/osv-scanner_darwin_amd64"
+checksum = "sha256:9f89beb6c3d784893cb1cae0a3d56c529bfe91075418c2f9440c45b79654198b"
+url = "https://github.com/google/osv-scanner/releases/download/v2.5.1/osv-scanner_darwin_amd64"
 
 [tools."github:google/osv-scanner"."platforms.macos-arm64"]
-checksum = "sha256:a8cd6507b06239f463a7642430cfd2d154882f150f6e30cdc0653e28dfc34216"
-url = "https://github.com/google/osv-scanner/releases/download/v2.3.8/osv-scanner_darwin_arm64"
+checksum = "sha256:75c44d6332f892a1e56286f4105a98ed751ae28d215ca0a8b65cc00d84103054"
+url = "https://github.com/google/osv-scanner/releases/download/v2.5.1/osv-scanner_darwin_arm64"
 
 [tools."github:google/osv-scanner"."platforms.windows-amd64"]
-checksum = "sha256:cb04e79dd9698a7bc821bbfdddec916a416d1409fda79c927c509d37d00c9716"
-url = "https://github.com/google/osv-scanner/releases/download/v2.3.8/osv-scanner_windows_amd64.exe"
+checksum = "sha256:25e42f5ef6711fd8c0fb45390972205891dd44c6bd02ac93f0f63e8e98d9bfb6"
+url = "https://github.com/google/osv-scanner/releases/download/v2.5.1/osv-scanner_windows_amd64.exe"
 
 [tools."github:google/osv-scanner"."platforms.windows-arm64"]
-checksum = "sha256:285d1fbcf2c69ab5ee38ae3a850ab46e83f32ef1cd5f3c4c9eb161cc493f6d52"
-url = "https://github.com/google/osv-scanner/releases/download/v2.3.8/osv-scanner_windows_arm64.exe"
+checksum = "sha256:33feb0b210a3e5ea7b338c719defc899f8833d990cdd297bcad4ff1a2586ec8b"
+url = "https://github.com/google/osv-scanner/releases/download/v2.5.1/osv-scanner_windows_arm64.exe"
 
 [[tools."github:goreleaser/goreleaser"]]
 version = "2.17.1"
@@ -738,12 +738,40 @@ backend = "go"
 [tools."go:mvdan.cc/sh/v3/cmd/shfmt"."platforms.windows-arm64"]
 
 [[tools."google/osv-scanner"]]
-version = "2.3.8"
+version = "2.5.1"
 backend = "github"
 
 [tools."google/osv-scanner"."platforms.linux-amd64"]
-checksum = "sha256:bc98e15319ed0d515e3f9235287ba53cdc5535d576d24fd573978ecfe9ab92dc"
-url = "https://github.com/google/osv-scanner/releases/download/v2.3.8/osv-scanner_linux_amd64"
+checksum = "sha256:f9f25499a2c8cc367b3af45df2ea7eeca7fbccceab9c35079968f4b3652194be"
+url = "https://github.com/google/osv-scanner/releases/download/v2.5.1/osv-scanner_linux_amd64"
+
+[tools."google/osv-scanner"."platforms.linux-amd64-musl"]
+checksum = "sha256:f9f25499a2c8cc367b3af45df2ea7eeca7fbccceab9c35079968f4b3652194be"
+url = "https://github.com/google/osv-scanner/releases/download/v2.5.1/osv-scanner_linux_amd64"
+
+[tools."google/osv-scanner"."platforms.linux-arm64"]
+checksum = "sha256:3d0f5aa5a6baa8eb32bcef247388e149ef6030a6634ccae6fa0d62681fb27a6d"
+url = "https://github.com/google/osv-scanner/releases/download/v2.5.1/osv-scanner_linux_arm64"
+
+[tools."google/osv-scanner"."platforms.linux-arm64-musl"]
+checksum = "sha256:3d0f5aa5a6baa8eb32bcef247388e149ef6030a6634ccae6fa0d62681fb27a6d"
+url = "https://github.com/google/osv-scanner/releases/download/v2.5.1/osv-scanner_linux_arm64"
+
+[tools."google/osv-scanner"."platforms.macos-amd64"]
+checksum = "sha256:9f89beb6c3d784893cb1cae0a3d56c529bfe91075418c2f9440c45b79654198b"
+url = "https://github.com/google/osv-scanner/releases/download/v2.5.1/osv-scanner_darwin_amd64"
+
+[tools."google/osv-scanner"."platforms.macos-arm64"]
+checksum = "sha256:75c44d6332f892a1e56286f4105a98ed751ae28d215ca0a8b65cc00d84103054"
+url = "https://github.com/google/osv-scanner/releases/download/v2.5.1/osv-scanner_darwin_arm64"
+
+[tools."google/osv-scanner"."platforms.windows-amd64"]
+checksum = "sha256:25e42f5ef6711fd8c0fb45390972205891dd44c6bd02ac93f0f63e8e98d9bfb6"
+url = "https://github.com/google/osv-scanner/releases/download/v2.5.1/osv-scanner_windows_amd64.exe"
+
+[tools."google/osv-scanner"."platforms.windows-arm64"]
+checksum = "sha256:33feb0b210a3e5ea7b338c719defc899f8833d990cdd297bcad4ff1a2586ec8b"
+url = "https://github.com/google/osv-scanner/releases/download/v2.5.1/osv-scanner_windows_arm64.exe"
 
 [[tools."goreleaser/goreleaser"]]
 version = "2.17.1"
