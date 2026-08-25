@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.1](https://github.com/snowdreamtech/UniGo/compare/v0.1.1...v0.1.1) (2026-08-25)
+
+
+### 🚀 Features
+
+* **release:** configure extra-files to auto-update docker.yml version ([585003e](https://github.com/snowdreamtech/UniGo/commit/585003e8f06b5d31a50c42733162ce1437f06e76))
+
+
+### ♻️ Miscellaneous Chores
+
+* **merge:** merge upstream/dev into dev ([43b9e62](https://github.com/snowdreamtech/UniGo/commit/43b9e62feafc312572607f86e65a6968cb9bc053))
+* release main ([700980f](https://github.com/snowdreamtech/UniGo/commit/700980f0d84553b1094f49745d30f5daf9a22b1b))
+
 ## [0.1.1](https://github.com/snowdreamtech/UniGo/compare/v0.1.0...v0.1.1) (2026-08-24)
 
 
