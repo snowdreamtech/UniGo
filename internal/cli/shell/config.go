@@ -120,7 +120,7 @@ func (m *ShellConfigManager) Inject(shell ShellType, marker string, content stri
 			return m.appendBlock(configFile, fullBlock)
 		}
 
-		return os.WriteFile(configFile, []byte(strings.Join(newLines, "\n")), 0644)
+		return os.WriteFile(configFile, []byte(strings.Join(newLines, "\n")), 0600)
 	}
 
 	if m.dryRun {
@@ -132,7 +132,7 @@ func (m *ShellConfigManager) Inject(shell ShellType, marker string, content stri
 }
 
 func (m *ShellConfigManager) appendBlock(configFile, fullBlock string) error {
-	f, err := os.OpenFile(configFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	f, err := os.OpenFile(configFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		return fmt.Errorf("failed to open config file: %w", err)
 	}
