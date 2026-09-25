@@ -126,7 +126,8 @@ func (v *NativeGPGVerifier) fetchKey(ctx context.Context, fingerprint string) (*
 			continue
 		}
 
-		keyData, err := io.ReadAll(resp.Body)
+		// 限制密钥文件大小为1MB
+		keyData, err := io.ReadAll(io.LimitReader(resp.Body, 1*1024*1024))
 		if err != nil {
 			continue
 		}
