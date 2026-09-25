@@ -18,7 +18,9 @@ import (
 
 	"github.com/snowdreamtech/unigo/internal/archive"
 	"github.com/snowdreamtech/unigo/internal/env"
+	pkgHttp "github.com/snowdreamtech/unigo/internal/http"
 	"github.com/snowdreamtech/unigo/internal/updater"
+	"github.com/snowdreamtech/unigo/internal/version"
 	"github.com/spf13/cobra"
 )
 
@@ -55,7 +57,7 @@ func runSelfUpdate(cmd *cobra.Command, args []string) error {
 	fmt.Printf("Current version: %s\n", currentVer)
 	fmt.Printf("Latest version:  %s\n", latestVer)
 
-	if latestVer == currentVer || latestVer == "" {
+	if latestVer == "" || version.CompareVersions(latestVer, currentVer) <= 0 {
 		fmt.Println("Already up to date.")
 		return nil
 	}
@@ -203,6 +205,7 @@ func runSelfUpdate(cmd *cobra.Command, args []string) error {
 func downloadWithRetry(ctx context.Context, url string) ([]byte, error) {
 	var respData []byte
 	var lastErr error
+	client := pkgHttp.NewClient()
 
 	for i := 0; i < 3; i++ {
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
@@ -210,7 +213,7 @@ func downloadWithRetry(ctx context.Context, url string) ([]byte, error) {
 			return nil, fmt.Errorf("failed to create request: %w", err)
 		}
 
-		resp, err := http.DefaultClient.Do(req)
+		resp, err := client.Do(req)
 		if err == nil && resp.StatusCode == http.StatusOK {
 			defer resp.Body.Close()
 			respData, lastErr = io.ReadAll(resp.Body)

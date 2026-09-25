@@ -17,6 +17,8 @@ import (
 	"github.com/snowdreamtech/unigo/internal/cli/output"
 	"github.com/snowdreamtech/unigo/internal/database"
 	"github.com/snowdreamtech/unigo/internal/env"
+	pkgHttp "github.com/snowdreamtech/unigo/internal/http"
+	"github.com/snowdreamtech/unigo/internal/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -140,7 +142,7 @@ func runDoctor(cmd *cobra.Command, args []string) error {
 		proxyURL := strings.TrimRight(firstProxy, "/")
 		ctxTimeout, cancel := context.WithTimeout(ctx, 3*time.Second)
 		req, _ := http.NewRequestWithContext(ctxTimeout, http.MethodGet, proxyURL, nil)
-		resp, err := http.DefaultClient.Do(req)
+		resp, err := pkgHttp.NewClient().Do(req)
 		cancel()
 		if err != nil {
 			output.Warningf("GOPROXY (%s) seems unreachable: %v", proxyURL, err)
@@ -163,14 +165,11 @@ func runDoctor(cmd *cobra.Command, args []string) error {
 }
 
 func getDirSize(path string) string {
-	var size int64
-	_ = filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
-		if err == nil && !info.IsDir() {
-			size += info.Size()
-		}
-		return nil
-	})
-	return formatSize(size)
+	size, err := utils.CalculateDirectorySize(path)
+	if err != nil {
+		return "-"
+	}
+	return utils.FormatBytes(size)
 }
 
 func getFileSize(path string) string {
@@ -178,21 +177,5 @@ func getFileSize(path string) string {
 	if err != nil {
 		return "0 B"
 	}
-	return formatSize(info.Size())
-}
-
-func formatSize(size int64) string {
-	if size == 0 {
-		return "0 B"
-	}
-	const unit = 1024
-	if size < unit {
-		return fmt.Sprintf("%d B", size)
-	}
-	div, exp := int64(unit), 0
-	for n := size / unit; n >= unit; n /= unit {
-		div *= unit
-		exp++
-	}
-	return fmt.Sprintf("%.1f %cB", float64(size)/float64(div), "KMGTPE"[exp])
+	return utils.FormatBytes(info.Size())
 }
