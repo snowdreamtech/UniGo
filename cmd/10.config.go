@@ -6,12 +6,12 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"log/slog"
 	"os"
 	"path/filepath"
 
 	"github.com/pterm/pterm"
 	"github.com/snowdreamtech/unigo/internal/env"
+	"github.com/snowdreamtech/unigo/internal/logger"
 	"github.com/spf13/cobra"
 )
 
@@ -64,7 +64,7 @@ var configGetCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		key := args[0]
-		slog.Debug("Getting config value", "key", key)
+		logger.Debug("Getting config value", "key", key)
 
 		conf := loadConfig()
 		if val, ok := conf[key]; ok {
@@ -83,7 +83,7 @@ var configSetCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		key := args[0]
 		val := args[1]
-		slog.Debug("Setting config value", "key", key, "value", val)
+		logger.Debug("Setting config value", "key", key, "value", val)
 
 		conf := loadConfig()
 		conf[key] = val
