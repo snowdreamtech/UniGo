@@ -18,6 +18,7 @@ import (
 	"github.com/mattn/go-isatty"
 	"github.com/pterm/pterm"
 	"github.com/snowdreamtech/unigo/internal/env"
+	pkgHttp "github.com/snowdreamtech/unigo/internal/http"
 	"github.com/snowdreamtech/unigo/internal/version"
 )
 
@@ -87,7 +88,7 @@ func writeCache(cache *UpdateCache) error {
 		return err
 	}
 
-	return os.WriteFile(getCachePath(), data, 0644)
+	return os.WriteFile(getCachePath(), data, 0600)
 }
 
 // ClearCache clears the update cache from disk.
@@ -122,8 +123,8 @@ func FetchLatestReleaseInfo(ctx context.Context) (*ReleaseInfo, error) {
 
 	req.Header.Set("Accept", "application/vnd.github.v3+json")
 
-	// Relies on default transport which respects HTTP_PROXY/HTTPS_PROXY env vars.
-	client := &http.Client{}
+	// Uses internal/http transport which respects HTTP_PROXY/HTTPS_PROXY/UNIRTM_HTTP_PROXY/NO_PROXY env vars
+	client := pkgHttp.NewClient()
 
 	var resp *http.Response
 	var fetchErr error
@@ -150,7 +151,7 @@ func FetchLatestReleaseInfo(ctx context.Context) (*ReleaseInfo, error) {
 	}
 	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
+	body, err := io.ReadAll(io.LimitReader(resp.Body, 10*1024*1024)) // 限制10MB响应体
 	if err != nil {
 		return nil, err
 	}
