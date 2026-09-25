@@ -51,6 +51,8 @@ var rootCmd = &cobra.Command{
 		// Initialize the global logger before any command runs.
 		// If --verbose is set, treat it as debug logging
 		logger.Init(verbose, quiet, silent, jsonOutput)
+		env.Quiet = quiet
+		env.Silent = silent
 
 		// Asynchronously check for a newer version (non-blocking).
 		updater.CheckUpdateAsync(env.GitTag)
