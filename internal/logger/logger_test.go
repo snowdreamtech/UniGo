@@ -141,3 +141,62 @@ func TestInit_DiscardWriter(t *testing.T) {
 	slog.Info("discarded info")
 	slog.Error("discarded error")
 }
+
+func TestSanitizeArgs(t *testing.T) {
+	args := []any{
+		"ProxyPassword", "super_secret_123",
+		"ProxyUser", "admin",
+		"token", "xyz_888",
+		"key", "my_api_key_value",
+		"apiKey", "ak_99999",
+		"private_key", "pem_secret",
+		"session_id", "sess_999",
+		"otp", "123456",
+		"url", "http://admin:pass123@proxy.example.com",
+		"header", "Bearer eyJhbGciOi...",
+		"query", "api_key=secret_val&param=1",
+		"pem", "-----BEGIN RSA PRIVATE KEY-----\nMIIEogIBAAKCAQ...\n-----END RSA PRIVATE KEY-----",
+		"gpg_key", "gpg_secret_data",
+		"ssh_key", "ssh_rsa_secret",
+		"rsa_private", "rsa_secret",
+	}
+	clean := sanitizeArgs(args...)
+
+	assert.Equal(t, "ProxyPassword", clean[0])
+	assert.Equal(t, "******", clean[1])
+	assert.Equal(t, "ProxyUser", clean[2])
+	assert.Equal(t, "admin", clean[3])
+	assert.Equal(t, "token", clean[4])
+	assert.Equal(t, "******", clean[5])
+	assert.Equal(t, "key", clean[6])
+	assert.Equal(t, "******", clean[7])
+	assert.Equal(t, "apiKey", clean[8])
+	assert.Equal(t, "******", clean[9])
+	assert.Equal(t, "private_key", clean[10])
+	assert.Equal(t, "******", clean[11])
+	assert.Equal(t, "session_id", clean[12])
+	assert.Equal(t, "******", clean[13])
+	assert.Equal(t, "otp", clean[14])
+	assert.Equal(t, "******", clean[15])
+	assert.Equal(t, "url", clean[16])
+	assert.Equal(t, "http://admin:******@proxy.example.com", clean[17])
+	assert.Equal(t, "header", clean[18])
+	assert.Equal(t, "Bearer ******", clean[19])
+	assert.Equal(t, "query", clean[20])
+	assert.Equal(t, "api_key=******&param=1", clean[21])
+	assert.Equal(t, "pem", clean[22])
+	assert.Equal(t, "******", clean[23])
+	assert.Equal(t, "gpg_key", clean[24])
+	assert.Equal(t, "******", clean[25])
+	assert.Equal(t, "ssh_key", clean[26])
+	assert.Equal(t, "******", clean[27])
+	assert.Equal(t, "rsa_private", clean[28])
+	assert.Equal(t, "******", clean[29])
+}
+
+func TestSanitizeString_PEMBlock(t *testing.T) {
+	rawPem := "Here is my key: -----BEGIN PGP PRIVATE KEY BLOCK-----\nSecretDataHere\n-----END PGP PRIVATE KEY BLOCK-----"
+	cleaned := sanitizeString(rawPem)
+	assert.Equal(t, "Here is my key: [REDACTED PRIVATE KEY]", cleaned)
+}
+
