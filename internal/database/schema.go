@@ -69,10 +69,34 @@ CREATE TABLE IF NOT EXISTS schema_migrations (
     applied_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     description TEXT NOT NULL
 );
+
+-- operation_history table
+CREATE TABLE IF NOT EXISTS operation_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    device TEXT NOT NULL,
+    device_name TEXT,
+    mode TEXT NOT NULL,
+    status TEXT NOT NULL,
+    error TEXT,
+    started_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    completed_at TIMESTAMP,
+    duration_ms INTEGER,
+    metadata TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_operation_history_started_at ON operation_history(started_at);
+CREATE INDEX IF NOT EXISTS idx_operation_history_device ON operation_history(device);
+
+-- preferences table
+CREATE TABLE IF NOT EXISTS preferences (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 `
 
 // CurrentSchemaVersion is the current schema version
-const CurrentSchemaVersion = 2
+const CurrentSchemaVersion = 3
 
 // migrations contains all schema migrations in order
 var migrations = []Migration{
@@ -87,5 +111,31 @@ var migrations = []Migration{
 		Description: "Add gpg_verification to audit_log",
 		Up:          "ALTER TABLE audit_log ADD COLUMN gpg_verification TEXT;",
 		Down:        "", // No down migration for adding a column in SQLite easily
+	},
+	{
+		Version:     3,
+		Description: "Add operation_history and preferences tables",
+		Up: `
+CREATE TABLE IF NOT EXISTS operation_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    device TEXT NOT NULL,
+    device_name TEXT,
+    mode TEXT NOT NULL,
+    status TEXT NOT NULL,
+    error TEXT,
+    started_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    completed_at TIMESTAMP,
+    duration_ms INTEGER,
+    metadata TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_operation_history_started_at ON operation_history(started_at);
+CREATE INDEX IF NOT EXISTS idx_operation_history_device ON operation_history(device);
+CREATE TABLE IF NOT EXISTS preferences (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+`,
+		Down: "",
 	},
 }
