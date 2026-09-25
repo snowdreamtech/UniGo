@@ -7,13 +7,13 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"sync"
 	"time"
 
+	"github.com/snowdreamtech/unigo/internal/errors"
 	"github.com/snowdreamtech/unigo/internal/repository"
 )
 

@@ -16,6 +16,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// RootCmd represents the base command structure.
+type RootCmd struct{}
+
 var (
 	quiet       bool
 	silent      bool
