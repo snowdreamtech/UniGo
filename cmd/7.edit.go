@@ -63,14 +63,11 @@ func runEdit(cmd *cobra.Command, args []string) error {
 }
 
 func getBestEditorWithSource() (string, string) {
-	if e := os.Getenv("UNIGO_EDITOR"); e != "" {
-		return e, "UNIGO_EDITOR"
+	if e := env.Get("EDITOR"); e != "" {
+		return e, "EDITOR"
 	}
 	if e := os.Getenv("VISUAL"); e != "" {
 		return e, "VISUAL"
-	}
-	if e := os.Getenv("EDITOR"); e != "" {
-		return e, "EDITOR"
 	}
 
 	// Fallbacks
