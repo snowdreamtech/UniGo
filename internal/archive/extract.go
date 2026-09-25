@@ -13,6 +13,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/klauspost/compress/zstd"
 	"github.com/pierrec/lz4/v4"
@@ -70,7 +71,8 @@ func ExtractBinary(archiveData []byte, binaryName string) ([]byte, error) {
 					return nil, fmt.Errorf("failed to open file in zip: %w", err)
 				}
 				defer rc.Close()
-				return io.ReadAll(rc)
+				// 限制读取大小为100MB，防止恶意zip炸弹
+				return io.ReadAll(io.LimitReader(rc, 100*1024*1024))
 			}
 		}
 		return nil, fmt.Errorf("%w: %s", ErrFileNotFound, binaryName)
@@ -102,10 +104,12 @@ func ExtractBinary(archiveData []byte, binaryName string) ([]byte, error) {
 			// Some formats (like gzip) can compress a single file without a container.
 			// Let's reset and read the entire decompressed stream.
 			decompressedAgain, _ := NewDecompressReader(bytes.NewReader(archiveData), format)
-			return io.ReadAll(decompressedAgain)
+			// 限制读取大小为100MB
+			return io.ReadAll(io.LimitReader(decompressedAgain, 100*1024*1024))
 		}
 		if filepath.Base(hdr.Name) == binaryName && !hdr.FileInfo().IsDir() {
-			return io.ReadAll(tr)
+			// 限制读取大小为100MB
+			return io.ReadAll(io.LimitReader(tr, 100*1024*1024))
 		}
 	}
 
@@ -167,14 +171,46 @@ func ExtractArchive(archiveData []byte, destDir string) error {
 	return nil
 }
 
+// validateExtractPath checks for path traversal attacks (Zip Slip vulnerability)
+func validateExtractPath(destDir, targetPath string) error {
+	cleanDest, err := filepath.Abs(filepath.Clean(destDir))
+	if err != nil {
+		return fmt.Errorf("invalid destination directory: %w", err)
+	}
+	cleanTarget, err := filepath.Abs(filepath.Clean(targetPath))
+	if err != nil {
+		return fmt.Errorf("invalid extraction path: %w", err)
+	}
+
+	relativeTarget, err := filepath.Rel(cleanDest, cleanTarget)
+	if err != nil {
+		return fmt.Errorf("cannot determine extraction path boundary: %w", err)
+	}
+	if relativeTarget == ".." || strings.HasPrefix(relativeTarget, ".."+string(os.PathSeparator)) {
+		return fmt.Errorf("illegal path traversal: %s escapes destination %s", targetPath, destDir)
+	}
+
+	// Check for dangerous patterns
+	if strings.Contains(targetPath, "..") {
+		return fmt.Errorf("illegal path contains '..': %s", targetPath)
+	}
+
+	return nil
+}
+
 func extractZipFile(f *zip.File, destDir string) error {
-	path := filepath.Join(destDir, f.Name)
-	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+	// Validate path before extraction
+	targetPath := filepath.Join(destDir, f.Name)
+	if err := validateExtractPath(destDir, targetPath); err != nil {
+		return err
+	}
+
+	if err := os.MkdirAll(filepath.Dir(targetPath), 0755); err != nil {
 		return err
 	}
 
 	if f.FileInfo().IsDir() {
-		return os.MkdirAll(path, f.Mode())
+		return os.MkdirAll(targetPath, sanitizeExtractMode(f.Mode()))
 	}
 
 	// Handle symlinks in ZIP
@@ -184,15 +220,22 @@ func extractZipFile(f *zip.File, destDir string) error {
 			return err
 		}
 		defer rc.Close()
-		target, err := io.ReadAll(rc)
+		// 限制符号链接目标路径长度为4KB
+		target, err := io.ReadAll(io.LimitReader(rc, 4096))
 		if err != nil {
 			return err
 		}
-		if err := os.Symlink(string(target), path); err != nil {
-			return fmt.Errorf("failed to create zip symlink %s: %w", path, err)
+
+		// Validate symlink target to prevent escape
+		symlinkTarget := string(target)
+		resolvedTarget := filepath.Join(filepath.Dir(targetPath), symlinkTarget)
+		if err := validateExtractPath(destDir, resolvedTarget); err != nil {
+			return fmt.Errorf("illegal symlink target: %w", err)
 		}
-		// For symlinks, Lchown is best effort
-		// os.Lchown(path, os.Getuid(), os.Getgid()) // Zip doesn't natively store UID/GID well
+
+		if err := os.Symlink(symlinkTarget, targetPath); err != nil {
+			return fmt.Errorf("failed to create zip symlink %s: %w", targetPath, err)
+		}
 		return nil
 	}
 
@@ -202,67 +245,89 @@ func extractZipFile(f *zip.File, destDir string) error {
 	}
 	defer rc.Close()
 
-	if err := writeToFile(path, rc); err != nil {
+	if err := writeToFile(targetPath, rc); err != nil {
 		return err
 	}
 
 	// Preserve permissions and modified time
-	if err := os.Chmod(path, f.Mode()); err != nil {
+	if err := os.Chmod(targetPath, sanitizeExtractMode(f.Mode())); err != nil {
 		return fmt.Errorf("failed to chmod: %w", err)
 	}
-	if err := os.Chtimes(path, f.Modified, f.Modified); err != nil {
+	if err := os.Chtimes(targetPath, f.Modified, f.Modified); err != nil {
 		return fmt.Errorf("failed to chtimes: %w", err)
 	}
 	return nil
 }
 
 func extractTarFile(tr *tar.Reader, hdr *tar.Header, destDir string) error {
-	path := filepath.Join(destDir, hdr.Name)
+	// Validate path before extraction
+	targetPath := filepath.Join(destDir, hdr.Name)
+	if err := validateExtractPath(destDir, targetPath); err != nil {
+		return err
+	}
+
 	mode := os.FileMode(hdr.Mode)
 
-	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(targetPath), 0755); err != nil {
 		return err
 	}
 
 	switch hdr.Typeflag {
 	case tar.TypeDir:
-		if err := os.MkdirAll(path, mode); err != nil {
+		if err := os.MkdirAll(targetPath, sanitizeExtractMode(mode)); err != nil {
 			return err
 		}
 		// Best effort chown
-		os.Chown(path, hdr.Uid, hdr.Gid)
+		os.Chown(targetPath, hdr.Uid, hdr.Gid)
 		return nil
 	case tar.TypeSymlink:
-		if err := os.Symlink(hdr.Linkname, path); err != nil {
-			return fmt.Errorf("failed to create symlink %s: %w", path, err)
+		// Validate symlink target to prevent escape
+		resolvedTarget := filepath.Join(filepath.Dir(targetPath), hdr.Linkname)
+		if err := validateExtractPath(destDir, resolvedTarget); err != nil {
+			return fmt.Errorf("illegal symlink target: %w", err)
 		}
-		os.Lchown(path, hdr.Uid, hdr.Gid) // Best effort
+
+		if err := os.Symlink(hdr.Linkname, targetPath); err != nil {
+			return fmt.Errorf("failed to create symlink %s: %w", targetPath, err)
+		}
+		os.Lchown(targetPath, hdr.Uid, hdr.Gid) // Best effort
 		return nil
 	case tar.TypeLink:
+		// Validate hard link target
 		linkPath := filepath.Join(destDir, hdr.Linkname)
-		if err := os.Link(linkPath, path); err != nil {
-			return fmt.Errorf("failed to create hardlink %s: %w", path, err)
+		if err := validateExtractPath(destDir, linkPath); err != nil {
+			return fmt.Errorf("illegal hardlink target: %w", err)
+		}
+
+		if err := os.Link(linkPath, targetPath); err != nil {
+			return fmt.Errorf("failed to create hardlink %s: %w", targetPath, err)
 		}
 		return nil
 	case tar.TypeReg, tar.TypeRegA:
-		if err := writeToFile(path, tr); err != nil {
+		if err := writeToFile(targetPath, tr); err != nil {
 			return err
 		}
 
 		// Preserve permissions, times, and ownership
-		if err := os.Chmod(path, mode); err != nil {
+		if err := os.Chmod(targetPath, sanitizeExtractMode(mode)); err != nil {
 			return fmt.Errorf("failed to chmod: %w", err)
 		}
-		if err := os.Chtimes(path, hdr.AccessTime, hdr.ModTime); err != nil {
+		if err := os.Chtimes(targetPath, hdr.AccessTime, hdr.ModTime); err != nil {
 			return fmt.Errorf("failed to chtimes: %w", err)
 		}
 		// Chown is best-effort since it usually requires root
-		os.Chown(path, hdr.Uid, hdr.Gid)
+		os.Chown(targetPath, hdr.Uid, hdr.Gid)
 		return nil
 	default:
 		// Ignore other types like block, char, fifo
 		return nil
 	}
+}
+
+const maxExtractFileBytes int64 = 512 * 1024 * 1024
+
+func sanitizeExtractMode(mode os.FileMode) os.FileMode {
+	return mode &^ (os.ModeSetuid | os.ModeSetgid | os.ModeSticky) & os.ModePerm
 }
 
 func writeToFile(path string, r io.Reader) error {
@@ -271,6 +336,13 @@ func writeToFile(path string, r io.Reader) error {
 		return err
 	}
 	defer out.Close()
-	_, err = io.Copy(out, r)
-	return err
+	written, err := io.Copy(out, io.LimitReader(r, maxExtractFileBytes+1))
+	if err != nil {
+		return err
+	}
+	if written > maxExtractFileBytes {
+		_ = os.Remove(path)
+		return fmt.Errorf("extracted file %s exceeds %d bytes", path, maxExtractFileBytes)
+	}
+	return nil
 }

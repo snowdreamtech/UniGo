@@ -26,6 +26,13 @@ func TestExtractArchive_Errors(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func TestValidateExtractPathUsesPathBoundary(t *testing.T) {
+	destDir := t.TempDir()
+	validTarget := filepath.Join(destDir, "file.txt")
+	assert.NoError(t, validateExtractPath(destDir, validTarget))
+	assert.Error(t, validateExtractPath(destDir, destDir+"-sibling/file.txt"))
+}
+
 func TestExtractBinary_Errors(t *testing.T) {
 	// Zip with invalid data
 	zipMagic := []byte{0x50, 0x4b, 0x03, 0x04}
@@ -99,4 +106,10 @@ func TestExtractZipFile_MkdirError(t *testing.T) {
 
 	err = extractZipFile(zr.File[1], tempDir)
 	assert.Error(t, err) // File MkdirAll fails
+}
+
+func TestSanitizeExtractModeStripsSetuidBits(t *testing.T) {
+	got := sanitizeExtractMode(os.ModeSetuid | os.ModeSetgid | os.ModeSticky | 0777)
+	assert.Equal(t, os.FileMode(0777), got)
+	assert.Equal(t, os.FileMode(0), got&(os.ModeSetuid|os.ModeSetgid|os.ModeSticky))
 }
