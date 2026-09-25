@@ -268,6 +268,7 @@ func TestHTTPDownloader_Download_InvalidURL(t *testing.T) {
 		{"invalid scheme", "ftp://example.com/file.txt"},
 		{"no host", "http:///file.txt"},
 		{"malformed URL", "ht!tp://example.com"},
+		{"insecure remote HTTP", "http://example.com/file.txt"},
 	}
 
 	for _, tt := range tests {
@@ -498,6 +499,12 @@ func TestHTTPDownloader_Download_OptionsTimeout(t *testing.T) {
 
 	require.Error(t, err, "Download should fail with timeout")
 	assert.True(t, errors.IsExternalError(err), "Should be an external error")
+}
+
+func TestHTTPDownloader_DefaultClientHasBoundedTimeout(t *testing.T) {
+	downloader := download.NewHTTPDownloader()
+	assert.NotNil(t, downloader)
+	assert.Equal(t, download.DefaultHTTPClientTimeout, downloader.DownloadTimeout(), "default client timeout must be bounded and consistent")
 }
 
 // TestHTTPDownloader_Download_CleanupOnFailure verifies partial download cleanup.

@@ -29,12 +29,13 @@ import (
 	"golang.org/x/crypto/blake2s"
 	"golang.org/x/crypto/sha3"
 
-	"log/slog"
+	"net"
 
 	"github.com/snowdreamtech/unigo/internal/env"
 	"github.com/snowdreamtech/unigo/internal/errors"
 	"github.com/snowdreamtech/unigo/internal/gpg"
 	pkgHttp "github.com/snowdreamtech/unigo/internal/http"
+	"github.com/snowdreamtech/unigo/internal/logger"
 )
 
 // ErrGPGSkipped is returned when a signature file is not found (404) and verification is skipped.
@@ -63,21 +64,22 @@ const githubProxyKey contextKey = "github_proxy"
 //	        fmt.Printf("Progress: %d/%d bytes\n", downloaded, total)
 //	    })
 //	err := downloader.Download(ctx, "https://example.com/file.tar.gz", "/tmp/file.tar.gz", opts)
+const DefaultHTTPClientTimeout = 15 * time.Minute
+
 type HTTPDownloader struct {
 	client *http.Client
 }
 
 // NewHTTPDownloader creates a new HTTPDownloader with default configuration.
 // The HTTP client is configured with:
-//   - Connection timeout: 10 seconds
-//   - Read timeout: 60 seconds
+//   - Bounded overall timeout to prevent indefinite hangs on slow or stalled networks
 //   - Proxy support via HTTP_PROXY/HTTPS_PROXY environment variables
 //   - Automatic redirect following (up to 10 redirects)
 func NewHTTPDownloader() *HTTPDownloader {
 	h := &HTTPDownloader{}
 	// Use the shared robust client: proxy bypass, HTTP/2 smart downgrade, and connection pool tuning are all pre-configured.
 	h.client = pkgHttp.NewClient()
-	h.client.Timeout = 0 // No overall timeout to allow large file downloads on slow networks
+	h.client.Timeout = DefaultHTTPClientTimeout
 
 	h.client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
 		if len(via) >= 10 {
@@ -125,6 +127,13 @@ func NewHTTPDownloader() *HTTPDownloader {
 //
 // Returns:
 //   - error: nil on success, or an error describing the failure
+func (h *HTTPDownloader) DownloadTimeout() time.Duration {
+	if h == nil || h.client == nil {
+		return 0
+	}
+	return h.client.Timeout
+}
+
 func (h *HTTPDownloader) Download(ctx context.Context, url string, destination string, opts DownloadOptions) error {
 	// Inject proxy into context for CheckRedirect
 	if opts.GitHubProxy != "" {
@@ -395,11 +404,11 @@ func (h *HTTPDownloader) VerifyChecksum(ctx context.Context, file string, expect
 		if l == 32 {
 			hashers = append(hashers, md5.New())
 			algos = append(algos, "md5")
-			slog.Warn("Security Warning: Auto-detected length 32 implies weak MD5 algorithm, which is not cryptographically secure.")
+			logger.Warn("Security Warning: Auto-detected length 32 implies weak MD5 algorithm, which is not cryptographically secure.")
 		} else if l == 40 {
 			hashers = append(hashers, sha1.New())
 			algos = append(algos, "sha1")
-			slog.Warn("Security Warning: Auto-detected length 40 implies weak SHA-1 algorithm, which is not cryptographically secure.")
+			logger.Warn("Security Warning: Auto-detected length 40 implies weak SHA-1 algorithm, which is not cryptographically secure.")
 		} else if l == 56 {
 			hashers = append(hashers, sha256.New224(), sha3.New224())
 			algos = append(algos, "sha224", "sha3-224")
@@ -616,19 +625,26 @@ func parseURL(rawURL string) (*url.URL, error) {
 		return nil, err
 	}
 
-	// Validate scheme
-	if u.Scheme == "http" {
-		slog.Warn("Using insecure HTTP for download. This is vulnerable to man-in-the-middle attacks.", slog.String("url", rawURL))
-	} else if u.Scheme != "https" {
+	if u.Scheme != "http" && u.Scheme != "https" {
 		return nil, fmt.Errorf("unsupported URL scheme %q (only http and https are supported)", u.Scheme)
 	}
-
-	// Validate host
 	if u.Host == "" {
 		return nil, fmt.Errorf("missing host in URL")
 	}
+	if u.Scheme == "http" && !isLoopbackDownloadHost(u.Hostname()) {
+		return nil, fmt.Errorf("insecure HTTP is not allowed for host %q (use HTTPS)", u.Hostname())
+	}
 
 	return u, nil
+}
+
+func isLoopbackDownloadHost(host string) bool {
+	host = strings.ToLower(strings.TrimSpace(host))
+	if host == "localhost" || host == "localhost." || host == "::1" {
+		return true
+	}
+	ip := net.ParseIP(host)
+	return ip != nil && ip.IsLoopback()
 }
 
 // parseChecksum parses a checksum string in "algorithm:hash" or "hash" format.

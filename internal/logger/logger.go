@@ -44,3 +44,23 @@ func Init(debug, quiet, silent, jsonFmt bool) {
 	logger := slog.New(handler)
 	slog.SetDefault(logger)
 }
+
+// Info logs at LevelInfo using the configured default logger.
+func Info(msg string, args ...any) {
+	slog.Info(msg, args...)
+}
+
+// Debug logs at LevelDebug using the configured default logger.
+func Debug(msg string, args ...any) {
+	slog.Debug(msg, args...)
+}
+
+// Warn logs at LevelWarn using the configured default logger.
+func Warn(msg string, args ...any) {
+	slog.Warn(msg, args...)
+}
+
+// Error logs at LevelError using the configured default logger.
+func Error(msg string, args ...any) {
+	slog.Error(msg, args...)
+}
