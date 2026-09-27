@@ -183,4 +183,3 @@ func TestGet_Validation(t *testing.T) {
 func TestEnvManager(t *testing.T) {
 	_ = EnvManager{}
 }
-

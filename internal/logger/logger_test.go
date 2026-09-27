@@ -199,4 +199,3 @@ func TestSanitizeString_PEMBlock(t *testing.T) {
 	cleaned := sanitizeString(rawPem)
 	assert.Equal(t, "Here is my key: [REDACTED PRIVATE KEY]", cleaned)
 }
-
