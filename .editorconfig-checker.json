@@ -1,3 +1,7 @@
 {
-  "Exclude": ["internal/addlicense/testdata", ".*\\.go$"]
+  "Exclude": [
+    "internal/addlicense/testdata",
+    "^\\.specify/",
+    ".*\\.go$"
+  ]
 }
