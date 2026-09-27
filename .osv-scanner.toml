@@ -9,3 +9,11 @@
 [[IgnoredVulns]]
 id = "GO-2026-5932"
 reason = "golang.org/x/crypto/openpgp is deprecated in x/crypto but openpgp is not imported or used"
+
+[[IgnoredVulns]]
+id = "GO-2026-6354"
+reason = "golang.org/x/crypto/ssh is not used; fix requires Go 1.26+ while project is pinned to Go 1.25.x"
+
+[[IgnoredVulns]]
+id = "GO-2026-6355"
+reason = "golang.org/x/crypto/ssh is not used; fix requires Go 1.26+ while project is pinned to Go 1.25.x"
