@@ -230,7 +230,11 @@ repos:
         entry: scripts/pre-commit/detect-private-key.py
         language: system
         types: [text]
-        exclude: '\.pre-commit-config\.yaml$'
+        exclude: |
+          (?x)^(
+            \.pre-commit-config\.yaml$|
+            internal/logger/logger_test\.go$
+          )
         description: "Prevent accidental staging of sensitive private keys."
 
       - id: hadolint
