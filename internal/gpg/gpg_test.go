@@ -208,142 +208,103 @@ func TestSystemGPGVerifier(t *testing.T) {
 	defer cancel()
 
 	// 1. Test when gpg is NOT in PATH
-	// We do this by temporarily setting a broken PATH
-	oldPath := os.Getenv("PATH")
-	t.Setenv("PATH", "/invalid/path/for/test")
-	defer os.Setenv("PATH", oldPath)
+	t.Run("missing_gpg", func(t *testing.T) {
+		t.Setenv("PATH", "/invalid/path/for/test")
 
-	if v.IsAvailable(ctx) {
-		t.Errorf("IsAvailable should return false when gpg is missing")
-	}
+		if v.IsAvailable(ctx) {
+			t.Errorf("IsAvailable should return false when gpg is missing")
+		}
 
-	err := v.Verify(ctx, "sig", "data", nil)
-	if err == nil || !strings.Contains(err.Error(), "gpg command not found") {
-		t.Errorf("expected 'gpg command not found', got %v", err)
-	}
-	os.Setenv("PATH", oldPath) // restore early
+		err := v.Verify(ctx, "sig", "data", nil)
+		if err == nil || !strings.Contains(err.Error(), "gpg command not found") {
+			t.Errorf("expected 'gpg command not found', got %v", err)
+		}
+	})
 
-	// 2. Create a mock gpg executable
-	mockGpgDir := t.TempDir()
+	// 2. Test with mock gpg executable
+	t.Run("mock_gpg", func(t *testing.T) {
+		mockGpgDir := t.TempDir()
 
-	// Create the mock script
-	var mockScript, ext string
-	if runtime.GOOS == "windows" {
-		ext = ".bat"
-		mockScript = `@echo off
-echo %* | findstr /C:"bad_key.sig" >nul
-if %errorlevel% equ 0 (
-    echo NO_PUBKEY 123456
-    exit /b 2
-)
-echo %* | findstr /C:"bad_sig.sig" >nul
-if %errorlevel% equ 0 (
-    echo BADSIG
-    exit /b 1
-)
-echo %* | findstr /C:"good_sig_no_match.sig" >nul
-if %errorlevel% equ 0 (
-    echo [GNUPG:] VALIDSIG ABCDEF
-    echo GOODSIG
-    exit /b 0
-)
-echo %* | findstr /C:"good_sig_match.sig" >nul
-if %errorlevel% equ 0 (
-    echo [GNUPG:] VALIDSIG MYFINGERPRINT
-    echo GOODSIG
-    exit /b 0
-)
-echo %* | findstr /C:"no_goodsig.sig" >nul
-if %errorlevel% equ 0 (
-    echo Something else
-    exit /b 0
-)
-echo %* | findstr /C:"fail_key" >nul
-if %errorlevel% equ 0 (
-    exit /b 1
-)
-exit /b 0
-`
-	} else {
-		mockScript = `#!/bin/sh
-case "$*" in
-    *bad_key.sig*)
-        echo "NO_PUBKEY 123456"
-        exit 2
-        ;;
-    *bad_sig.sig*)
-        echo "BADSIG"
-        exit 1
-        ;;
-    *good_sig_no_match.sig*)
-        echo "[GNUPG:] VALIDSIG ABCDEF"
-        echo "GOODSIG"
-        exit 0
-        ;;
-    *good_sig_match.sig*)
-        echo "[GNUPG:] VALIDSIG MYFINGERPRINT"
-        echo "GOODSIG"
-        exit 0
-        ;;
-    *no_goodsig.sig*)
-        echo "Something else"
-        exit 0
-        ;;
-    *fail_key*)
-        exit 1
-        ;;
-esac
-exit 0
-`
-	}
-	mockGpgPath := filepath.Join(mockGpgDir, "gpg"+ext)
-	os.WriteFile(mockGpgPath, []byte(mockScript), 0755)
+		mockScript := "#!/bin/sh\n" +
+			"case \"$*\" in\n" +
+			"    *bad_key.sig*)\n" +
+			"        echo \"NO_PUBKEY 123456\"\n" +
+			"        exit 2\n" +
+			"        ;;\n" +
+			"    *bad_sig.sig*)\n" +
+			"        echo \"BADSIG\"\n" +
+			"        exit 1\n" +
+			"        ;;\n" +
+			"    *good_sig_no_match.sig*)\n" +
+			"        echo \"[GNUPG:] VALIDSIG ABCDEF\"\n" +
+			"        echo \"GOODSIG\"\n" +
+			"        exit 0\n" +
+			"        ;;\n" +
+			"    *good_sig_match.sig*)\n" +
+			"        echo \"[GNUPG:] VALIDSIG MYFINGERPRINT\"\n" +
+			"        echo \"GOODSIG\"\n" +
+			"        exit 0\n" +
+			"        ;;\n" +
+			"    *no_goodsig.sig*)\n" +
+			"        echo \"Something else\"\n" +
+			"        exit 0\n" +
+			"        ;;\n" +
+			"    *fail_key*)\n" +
+			"        exit 1\n" +
+			"        ;;\n" +
+			"esac\n" +
+			"exit 0\n"
 
-	// Prepend mock to PATH
-	t.Setenv("PATH", mockGpgDir+string(os.PathListSeparator)+oldPath)
-	defer os.Setenv("PATH", oldPath)
+		mockGpgPath := filepath.Join(mockGpgDir, "gpg")
+		if err := os.WriteFile(mockGpgPath, []byte(mockScript), 0755); err != nil {
+			t.Fatalf("failed to write mock gpg: %v", err)
+		}
 
-	// 3. Test Verify NO_PUBKEY
-	err = v.Verify(ctx, "bad_key.sig", "data.txt", nil)
-	if err == nil || !strings.Contains(err.Error(), "missing public key") {
-		t.Errorf("expected missing public key error, got %v", err)
-	}
+		oldPath := os.Getenv("PATH")
+		t.Setenv("PATH", mockGpgDir+string(os.PathListSeparator)+oldPath)
 
-	// 4. Test Verify BADSIG
-	err = v.Verify(ctx, "bad_sig.sig", "data.txt", nil)
-	if err == nil || !strings.Contains(err.Error(), "verification failed") {
-		t.Errorf("expected verification failed error, got %v", err)
-	}
+		// Test Verify NO_PUBKEY
+		err := v.Verify(ctx, "bad_key.sig", "data.txt", nil)
+		if err == nil || !strings.Contains(err.Error(), "missing public key") {
+			t.Errorf("expected missing public key error, got %v", err)
+		}
 
-	// 5. Test Verify GOODSIG but unmatched fingerprint
-	err = v.Verify(ctx, "good_sig_no_match.sig", "data.txt", []string{"MYFINGERPRINT"})
-	if err == nil || !strings.Contains(err.Error(), "security violation") {
-		t.Errorf("expected security violation error, got %v", err)
-	}
+		// Test Verify BADSIG
+		err = v.Verify(ctx, "bad_sig.sig", "data.txt", nil)
+		if err == nil || !strings.Contains(err.Error(), "verification failed") {
+			t.Errorf("expected verification failed error, got %v", err)
+		}
 
-	// 6. Test Verify GOODSIG and matched fingerprint
-	err = v.Verify(ctx, "good_sig_match.sig", "data.txt", []string{"MYFINGERPRINT"})
-	if err != nil {
-		t.Errorf("expected success, got %v", err)
-	}
+		// Test Verify GOODSIG but unmatched fingerprint
+		err = v.Verify(ctx, "good_sig_no_match.sig", "data.txt", []string{"MYFINGERPRINT"})
+		if err == nil || !strings.Contains(err.Error(), "security violation") {
+			t.Errorf("expected security violation error, got %v", err)
+		}
 
-	// 7. Test Verify with output missing GOODSIG
-	err = v.Verify(ctx, "no_goodsig.sig", "data.txt", nil)
-	if err == nil || !strings.Contains(err.Error(), "no valid signature found") {
-		t.Errorf("expected no valid signature found error, got %v", err)
-	}
+		// Test Verify GOODSIG and matched fingerprint
+		err = v.Verify(ctx, "good_sig_match.sig", "data.txt", []string{"MYFINGERPRINT"})
+		if err != nil {
+			t.Errorf("expected success, got %v", err)
+		}
 
-	// 8. Test ImportKey Success
-	err = v.ImportKey(ctx, "MYFINGERPRINT")
-	if err != nil {
-		t.Errorf("expected ImportKey success, got %v", err)
-	}
+		// Test Verify with output missing GOODSIG
+		err = v.Verify(ctx, "no_goodsig.sig", "data.txt", nil)
+		if err == nil || !strings.Contains(err.Error(), "no valid signature found") {
+			t.Errorf("expected no valid signature found error, got %v", err)
+		}
 
-	// 9. Test ImportKey Fail
-	err = v.ImportKey(ctx, "fail_key")
-	if err == nil {
-		t.Errorf("expected ImportKey to fail")
-	}
+		// Test ImportKey Success
+		err = v.ImportKey(ctx, "MYFINGERPRINT")
+		if err != nil {
+			t.Errorf("expected ImportKey success, got %v", err)
+		}
+
+		// Test ImportKey Fail
+		err = v.ImportKey(ctx, "fail_key")
+		if err == nil {
+			t.Errorf("expected ImportKey to fail")
+		}
+	})
 }
 
 func TestNativeGPGVerifier_Verify_Errors(t *testing.T) {

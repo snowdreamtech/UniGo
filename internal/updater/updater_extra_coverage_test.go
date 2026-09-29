@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/snowdreamtech/unigo/internal/env"
+	pkgHttp "github.com/snowdreamtech/unigo/internal/http"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -22,10 +23,10 @@ type customTransport struct {
 }
 
 func (t *customTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	// Redirect all requests to our test server
-	req.URL.Scheme = "http"
-	req.URL.Host = t.server.Listener.Addr().String()
-	return t.rt.RoundTrip(req)
+	cloned := req.Clone(req.Context())
+	cloned.URL.Scheme = "http"
+	cloned.URL.Host = t.server.Listener.Addr().String()
+	return t.rt.RoundTrip(cloned)
 }
 
 func TestFetchLatestReleaseInfo_Success(t *testing.T) {
@@ -41,9 +42,9 @@ func TestFetchLatestReleaseInfo_Success(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	originalTransport := http.DefaultTransport
-	defer func() { http.DefaultTransport = originalTransport }()
-	http.DefaultTransport = &customTransport{
+	origMock := pkgHttp.MockTransport
+	defer func() { pkgHttp.MockTransport = origMock }()
+	pkgHttp.MockTransport = &customTransport{
 		rt:     http.DefaultTransport,
 		server: ts,
 	}
@@ -60,9 +61,9 @@ func TestFetchLatestReleaseInfo_HttpError(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	originalTransport := http.DefaultTransport
-	defer func() { http.DefaultTransport = originalTransport }()
-	http.DefaultTransport = &customTransport{
+	origMock := pkgHttp.MockTransport
+	defer func() { pkgHttp.MockTransport = origMock }()
+	pkgHttp.MockTransport = &customTransport{
 		rt:     http.DefaultTransport,
 		server: ts,
 	}
@@ -80,9 +81,9 @@ func TestFetchLatestReleaseInfo_JSONError(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	originalTransport := http.DefaultTransport
-	defer func() { http.DefaultTransport = originalTransport }()
-	http.DefaultTransport = &customTransport{
+	origMock := pkgHttp.MockTransport
+	defer func() { pkgHttp.MockTransport = origMock }()
+	pkgHttp.MockTransport = &customTransport{
 		rt:     http.DefaultTransport,
 		server: ts,
 	}
@@ -98,9 +99,9 @@ func TestFetchLatestReleaseInfo_Timeout(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	originalTransport := http.DefaultTransport
-	defer func() { http.DefaultTransport = originalTransport }()
-	http.DefaultTransport = &customTransport{
+	origMock := pkgHttp.MockTransport
+	defer func() { pkgHttp.MockTransport = origMock }()
+	pkgHttp.MockTransport = &customTransport{
 		rt:     http.DefaultTransport,
 		server: ts,
 	}
@@ -113,6 +114,8 @@ func TestFetchLatestReleaseInfo_Timeout(t *testing.T) {
 }
 
 func TestClearCache(t *testing.T) {
+	t.Setenv("UNIGO_DATA_DIR", t.TempDir())
+
 	// write something to cache first
 	cache := UpdateCache{LatestVersion: "v1.2.3"}
 	writeCache(&cache)
@@ -126,6 +129,8 @@ func TestClearCache(t *testing.T) {
 }
 
 func TestCheckUpdateAsync(t *testing.T) {
+	t.Setenv("UNIGO_DATA_DIR", t.TempDir())
+
 	// Make silent to return early
 	env.Silent = true
 	CheckUpdateAsync("1.0.0")
@@ -147,20 +152,20 @@ func TestCheckUpdateAsync(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	originalTransport := http.DefaultTransport
-	defer func() { http.DefaultTransport = originalTransport }()
-	http.DefaultTransport = &customTransport{
+	origMock := pkgHttp.MockTransport
+	defer func() { pkgHttp.MockTransport = origMock }()
+	pkgHttp.MockTransport = &customTransport{
 		rt:     http.DefaultTransport,
 		server: ts,
 	}
 
 	CheckUpdateAsync("1.0.0")
-	// wait for async to finish
-	time.Sleep(50 * time.Millisecond)
 
-	cache, err := readCache()
-	assert.NoError(t, err)
-	assert.Equal(t, "2.0.0", cache.LatestVersion)
+	// Poll until async goroutine completes rather than fixed sleep
+	assert.Eventually(t, func() bool {
+		cache, err := readCache()
+		return err == nil && cache.LatestVersion == "2.0.0"
+	}, 3*time.Second, 10*time.Millisecond, "cache should be updated asynchronously to version 2.0.0")
 }
 
 func TestPromptIfAvailable(t *testing.T) {

@@ -119,6 +119,9 @@ func TestLoadUnreadableConfig(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("Windows does not support Unix-style file permissions for testing unreadable files")
 	}
+	if os.Geteuid() == 0 {
+		t.Skip("skipping test when running as root (DAC permissions do not restrict root)")
+	}
 
 	tmpDir, _ := os.MkdirTemp("", "unigo_config_test")
 	defer os.RemoveAll(tmpDir)
@@ -155,6 +158,9 @@ func TestSaveMkdirError(t *testing.T) {
 func TestSaveWriteError(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("Windows does not support Unix-style directory permissions for testing read-only directories")
+	}
+	if os.Geteuid() == 0 {
+		t.Skip("skipping test when running as root (DAC permissions do not restrict root)")
 	}
 	tmpDir, _ := os.MkdirTemp("", "unigo_config_test")
 	defer func() {
