@@ -130,9 +130,7 @@ release:
     owner: snowdreamtech
     name: unigo
   header: |
-    **Snowdream Tech AI IDE Template** is an enterprise-grade, foundational template designed for multi-AI IDE collaboration.
-
-    This repository serves as a **Single Source of Truth** for AI agent rules, workflows, and project configurations, supporting over 50 different AI-assisted IDEs with massive multi-language support.
+    **UniGo** is a fast, flexible, and enterprise-grade Golang CLI application and foundational template.
   footer: |
     **Full Changelog**: https://github.com/snowdreamtech/unigo/compare/{{ .PreviousTag }}...{{ .Tag }}
 
@@ -191,7 +189,7 @@ nfpms:
     homepage: https://github.com/snowdreamtech/unigo
     maintainer: "Snowdream Tech <snowdreamtech@qq.com>"
     description: |-
-      Snowdream Tech AI IDE Template is an enterprise-grade, foundational template designed for multi-AI IDE collaboration.
+      UniGo is a fast, flexible, and enterprise-grade Golang CLI application and foundational template.
     license: MIT
     vendor: SnowdreamTech
     bindir: /usr/bin
@@ -243,9 +241,9 @@ nfpms:
 
 snapcrafts:
   - name_template: "{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
-    summary: Snowdream Tech AI IDE Template
+    summary: UniGo CLI Application
     description: |
-      Snowdream Tech AI IDE Template is an enterprise-grade, foundational template designed for multi-AI IDE collaboration.
+      UniGo is a fast, flexible, and enterprise-grade Golang CLI application and foundational template.
     grade: stable
     confinement: classic
     publish: false
@@ -297,7 +295,7 @@ homebrew_casks:
     homepage: "https://github.com/snowdreamtech/unigo"
     url:
       template: "https://github.com/snowdreamtech/unigo/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-    description: "Snowdream Tech AI IDE Template is an enterprise-grade, foundational template designed for multi-AI IDE collaboration."
+    description: "UniGo is a fast, flexible, and enterprise-grade Golang CLI application and foundational template."
     license: "MIT"
     hooks:
       post:
@@ -311,7 +309,7 @@ winget:
     publisher: SnowdreamTech
     license: MIT
     homepage: https://github.com/snowdreamtech/unigo
-    short_description: Snowdream Tech AI IDE Template
+    short_description: UniGo CLI Application
     repository:
       owner: snowdreamtech
       name: winget-pkgs
@@ -330,7 +328,7 @@ scoops:
       name: scoop-bucket
       token: "{{ .Env.WORKFLOW_SECRET }}"
     homepage: https://github.com/snowdreamtech/unigo
-    description: Snowdream Tech AI IDE Template is an enterprise-grade, foundational template designed for multi-AI IDE collaboration.
+    description: UniGo is a fast, flexible, and enterprise-grade Golang CLI application and foundational template.
     license: MIT
 
 nix:
@@ -339,13 +337,13 @@ nix:
       name: nur
       token: "{{ .Env.WORKFLOW_SECRET }}"
     homepage: https://github.com/snowdreamtech/unigo
-    description: Snowdream Tech AI IDE Template is an enterprise-grade, foundational template designed for multi-AI IDE collaboration.
+    description: UniGo is a fast, flexible, and enterprise-grade Golang CLI application and foundational template.
     license: mit
     skip_upload: auto
 
 aurs:
   - homepage: https://github.com/snowdreamtech/unigo
-    description: Snowdream Tech AI IDE Template is an enterprise-grade, foundational template designed for multi-AI IDE collaboration.
+    description: UniGo is a fast, flexible, and enterprise-grade Golang CLI application and foundational template.
     maintainers:
       - "Snowdream Tech <snowdreamtech@qq.com>"
     license: MIT
