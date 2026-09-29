@@ -39,7 +39,7 @@ url = "https://github.com/anchore/syft/releases/download/v1.51.1/syft_1.51.1_win
 
 [[tools."github:anchore/syft"]]
 version = "1.52.0"
-backend = ""
+backend = "github"
 
 [tools."github:anchore/syft"."platforms.linux-amd64"]
 checksum = "sha256:caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d"
@@ -200,7 +200,7 @@ url = "https://github.com/cli/cli/releases/download/v2.100.0/gh_2.100.0_windows_
 
 [[tools."github:cli/cli"]]
 version = "2.101.0"
-backend = ""
+backend = "github"
 
 [tools."github:cli/cli"."platforms.linux-amd64"]
 checksum = "sha256:9bca2d1c16825f109907a23307628a2f0698fbf99662b73a5cf0b020293072b8"
@@ -444,7 +444,7 @@ url = "https://github.com/google/osv-scanner/releases/download/v2.5.1/osv-scanne
 
 [[tools."github:google/osv-scanner"]]
 version = "2.6.0"
-backend = ""
+backend = "github"
 
 [tools."github:google/osv-scanner"."platforms.linux-amd64"]
 checksum = "sha256:ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108"
@@ -516,7 +516,7 @@ url = "https://github.com/goreleaser/goreleaser/releases/download/v2.18.0/gorele
 
 [[tools."github:goreleaser/goreleaser"]]
 version = "2.18.2"
-backend = ""
+backend = "github"
 
 [tools."github:goreleaser/goreleaser"."platforms.linux-amd64"]
 checksum = "sha256:0a96edc9d9bc594e4a41cc4d59467c182062910ab24d9d1f6dd7b667d32606d3"
@@ -670,7 +670,7 @@ url = "https://github.com/zizmorcore/zizmor/releases/download/v1.30.0/zizmor-x86
 
 [[tools."github:zizmorcore/zizmor"]]
 version = "1.30.1"
-backend = ""
+backend = "github"
 
 [tools."github:zizmorcore/zizmor"."platforms.linux-amd64"]
 url = "https://github.com/zizmorcore/zizmor/releases/download/v1.30.1/zizmor-x86_64-unknown-linux-gnu.tar.gz"
@@ -737,25 +737,25 @@ checksum = "sha256:13b69b87bb0e83f96bc68560a8cace7f0343b1e03469f1110ea18d17e3234
 url = "https://go.dev/dl/go1.27.1.windows-arm64.zip"
 gpg_key = "EB4C1BF148A2C440F831EE8752D905A67D74191C"
 
-[[tools."go:github.com/golangci/golangci-lint/v2/cmd/golangci-lint"]]
-version = "v2.13.2"
+[[tools."go:github.com/golangci/golangci-lint/cmd/golangci-lint"]]
+version = "v1.64.8"
 backend = "go"
 
-[tools."go:github.com/golangci/golangci-lint/v2/cmd/golangci-lint"."platforms.linux-amd64"]
+[tools."go:github.com/golangci/golangci-lint/cmd/golangci-lint"."platforms.linux-amd64"]
 
-[tools."go:github.com/golangci/golangci-lint/v2/cmd/golangci-lint"."platforms.linux-amd64-musl"]
+[tools."go:github.com/golangci/golangci-lint/cmd/golangci-lint"."platforms.linux-amd64-musl"]
 
-[tools."go:github.com/golangci/golangci-lint/v2/cmd/golangci-lint"."platforms.linux-arm64"]
+[tools."go:github.com/golangci/golangci-lint/cmd/golangci-lint"."platforms.linux-arm64"]
 
-[tools."go:github.com/golangci/golangci-lint/v2/cmd/golangci-lint"."platforms.linux-arm64-musl"]
+[tools."go:github.com/golangci/golangci-lint/cmd/golangci-lint"."platforms.linux-arm64-musl"]
 
-[tools."go:github.com/golangci/golangci-lint/v2/cmd/golangci-lint"."platforms.macos-amd64"]
+[tools."go:github.com/golangci/golangci-lint/cmd/golangci-lint"."platforms.macos-amd64"]
 
-[tools."go:github.com/golangci/golangci-lint/v2/cmd/golangci-lint"."platforms.macos-arm64"]
+[tools."go:github.com/golangci/golangci-lint/cmd/golangci-lint"."platforms.macos-arm64"]
 
-[tools."go:github.com/golangci/golangci-lint/v2/cmd/golangci-lint"."platforms.windows-amd64"]
+[tools."go:github.com/golangci/golangci-lint/cmd/golangci-lint"."platforms.windows-amd64"]
 
-[tools."go:github.com/golangci/golangci-lint/v2/cmd/golangci-lint"."platforms.windows-arm64"]
+[tools."go:github.com/golangci/golangci-lint/cmd/golangci-lint"."platforms.windows-arm64"]
 
 [[tools."go:github.com/securego/gosec/v2/cmd/gosec"]]
 version = "v2.29.0"
@@ -819,7 +819,7 @@ backend = "go"
 
 [[tools."go:golang.org/x/vuln/cmd/govulncheck"]]
 version = "v1.8.0"
-backend = ""
+backend = "go"
 
 [tools."go:golang.org/x/vuln/cmd/govulncheck"."platforms.linux-amd64"]
 
@@ -1255,7 +1255,7 @@ backend = "pipx"
 
 [[tools."pipx:clang-format"]]
 version = "23.1.1"
-backend = ""
+backend = "pipx"
 
 [tools."pipx:clang-format"."platforms.linux-amd64"]
 
