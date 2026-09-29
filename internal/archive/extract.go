@@ -171,6 +171,77 @@ func ExtractArchive(archiveData []byte, destDir string) error {
 	return nil
 }
 
+// ExtractArchiveFromFile extracts an archive directly from a file path without loading the entire archive into memory.
+func ExtractArchiveFromFile(archiveFilePath string, destDir string) error {
+	f, err := os.Open(archiveFilePath)
+	if err != nil {
+		return fmt.Errorf("failed to open archive file: %w", err)
+	}
+	defer f.Close()
+
+	header := make([]byte, 512)
+	n, _ := f.Read(header)
+	format := DetectFormat(header[:n])
+
+	if format == FormatZip {
+		_ = f.Close()
+		zr, err := zip.OpenReader(archiveFilePath)
+		if err != nil {
+			return fmt.Errorf("failed to open zip file: %w", err)
+		}
+		defer zr.Close()
+
+		for _, file := range zr.File {
+			if err := extractZipFile(file, destDir); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
+	if _, err := f.Seek(0, io.SeekStart); err != nil {
+		return fmt.Errorf("failed to seek archive: %w", err)
+	}
+
+	decompressed, err := NewDecompressReader(f, format)
+	if err != nil {
+		return err
+	}
+
+	if format == FormatRaw {
+		path := filepath.Join(destDir, "data.bin")
+		if err := writeToFile(path, decompressed); err != nil {
+			return err
+		}
+		return os.Chmod(path, 0755)
+	}
+
+	tr := tar.NewReader(decompressed)
+	for {
+		hdr, err := tr.Next()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			if _, seekErr := f.Seek(0, io.SeekStart); seekErr == nil {
+				if d2, err2 := NewDecompressReader(f, format); err2 == nil {
+					path := filepath.Join(destDir, "data.bin")
+					if err := writeToFile(path, d2); err != nil {
+						return err
+					}
+					return os.Chmod(path, 0755)
+				}
+			}
+			return fmt.Errorf("failed to extract tar stream: %w", err)
+		}
+		if err := extractTarFile(tr, hdr, destDir); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // validateExtractPath checks for path traversal attacks (Zip Slip vulnerability)
 func validateExtractPath(destDir, targetPath string) error {
 	cleanDest, err := filepath.Abs(filepath.Clean(destDir))

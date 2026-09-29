@@ -159,3 +159,33 @@ func TestCompressAndExtractTar(t *testing.T) {
 	// The content will be the tar file itself, not "hello tar". So we just check err == nil
 	assert.NotEmpty(t, content)
 }
+
+func TestExtractArchiveFromFile(t *testing.T) {
+	files := map[string]FileEntry{
+		"sub/file.txt": {
+			Data:    []byte("stream extraction test content"),
+			Mode:    0644,
+			ModTime: time.Now(),
+		},
+	}
+
+	for _, format := range []Format{FormatZip, FormatGzip} {
+		t.Run(string(format), func(t *testing.T) {
+			var buf bytes.Buffer
+			err := CompressFiles(&buf, format, files)
+			require.NoError(t, err)
+
+			tmpFile := filepath.Join(t.TempDir(), "archive_test")
+			require.NoError(t, os.WriteFile(tmpFile, buf.Bytes(), 0644))
+
+			destDir := t.TempDir()
+			err = ExtractArchiveFromFile(tmpFile, destDir)
+			require.NoError(t, err)
+
+			extracted := filepath.Join(destDir, "sub", "file.txt")
+			data, err := os.ReadFile(extracted)
+			require.NoError(t, err)
+			assert.Equal(t, "stream extraction test content", string(data))
+		})
+	}
+}
