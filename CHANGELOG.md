@@ -1,5 +1,79 @@
 # Changelog
 
+## [0.3.0](https://github.com/snowdreamtech/UniGo/compare/v0.2.0...v0.3.0) (2026-09-29)
+
+
+### 🚀 Features
+
+* **archive:** implement streaming archive extraction from file to minimize memory footprint ([cbfc9a3](https://github.com/snowdreamtech/UniGo/commit/cbfc9a379355eff6fd4c42f9f4d37c41b2eed305))
+* **database:** upgrade schema to v3 adding operation_history and preferences tables ([73af111](https://github.com/snowdreamtech/UniGo/commit/73af1114461b6facb217c21853ffca0b7f8820d5))
+* **env:** validate critical environment variables and declare concrete config struct types ([02715cb](https://github.com/snowdreamtech/UniGo/commit/02715cb3e6459614f02e0f3691b14a7757a37416))
+* **release:** initialize VERSION ARG in Dockerfiles for Release-Please change tracking ([3dc1c9c](https://github.com/snowdreamtech/UniGo/commit/3dc1c9c6208ec730e5231b19adc29b98bdb58068))
+
+
+### 🐛 Bug Fixes
+
+* **archive:** prevent Zip Slip path traversal and cap decompression resource limits ([2c46d01](https://github.com/snowdreamtech/UniGo/commit/2c46d01048e488e77a0b23e2a13d8bdcd2ef852f))
+* **ci:** align verify job artifact patterns with standardized goreleaser naming ([5308e88](https://github.com/snowdreamtech/UniGo/commit/5308e88c9047045d16128c3d6e26ef7cb82dc0e8))
+* **cli:** sync quiet and silent flags to env package in root pre-run hook ([cdcf6db](https://github.com/snowdreamtech/UniGo/commit/cdcf6db37928f99cf0ba803ee322cbe333b3ff85))
+* **cmd:** harden config file write permissions to 0600 ([bfd17f4](https://github.com/snowdreamtech/UniGo/commit/bfd17f4887b1cdea36c4b0d4be28a6ad0370b014))
+* **config:** ensure atomic configuration save with temporary file and rename ([9a93468](https://github.com/snowdreamtech/UniGo/commit/9a93468c836b02763247221345f887253123b720))
+* **config:** harden config file write permissions to 0600 and add GetDefaultConfig ([020c2ba](https://github.com/snowdreamtech/UniGo/commit/020c2ba2c6c71896d5a6fe2f876f670c412b03b2))
+* **deps:** add missing windows-amd64 platform for python in unirtm.lock ([fa18c7c](https://github.com/snowdreamtech/UniGo/commit/fa18c7cd60bf9ffec9259b3ae749fc8faef68aec))
+* **docker:** set go.mod to 1.27.0 and enable GOTOOLCHAIN=auto in builder stages ([01d4d9c](https://github.com/snowdreamtech/UniGo/commit/01d4d9c258a35455807f2d9e010cbee3dc83da24))
+* **docs:** add --legacy-peer-deps to pages workflow for vitepress build ([261ffd8](https://github.com/snowdreamtech/UniGo/commit/261ffd8e628c0c1a086a54dff0861848ddf940c9))
+* **download:** reject insecure non-loopback HTTP and bound client timeout ([c4cb3e7](https://github.com/snowdreamtech/UniGo/commit/c4cb3e76052d0c06c2cae45bbdb4f1944e1d1caa))
+* **gpg:** cap key download size to 1MB and isolate test temp files ([bf43377](https://github.com/snowdreamtech/UniGo/commit/bf43377e3691985d1cbcb6b0a505e875133a29be))
+* **http:** support non-standard DefaultTransport and bypass proxy for loopback ([ef64bf7](https://github.com/snowdreamtech/UniGo/commit/ef64bf759dd1f746bd53037e3a9d09008b20f0e3))
+* **logger:** automatically sanitize sensitive credentials, tokens, and private keys ([e6544a5](https://github.com/snowdreamtech/UniGo/commit/e6544a517aeb783dabc522fc6b9309dcf87b16dd))
+* **shell:** harden shell configuration file permissions to 0600 ([09641d7](https://github.com/snowdreamtech/UniGo/commit/09641d7c62a0092f8e135ac394340694b857861a))
+* **updater:** harden cache permissions to 0600 and bound response body size ([1cacc83](https://github.com/snowdreamtech/UniGo/commit/1cacc8329363d62f763553cf75893826b3c969f1))
+
+
+### 🛠 Refactoring
+
+* **cmd:** enhance self-update version comparison and unify doctor utility helpers ([7a1cfaa](https://github.com/snowdreamtech/UniGo/commit/7a1cfaa56db9f09199ba023e4bd585d0991742f7))
+* **cmd:** unify editor resolution via env.Get in edit command ([f6cb42a](https://github.com/snowdreamtech/UniGo/commit/f6cb42a8c6a549a76fce050e2adfeb9b75a29966))
+* **cmd:** use internal/logger in config command ([2647ab7](https://github.com/snowdreamtech/UniGo/commit/2647ab70789588d93df632434e1a3c476f481416))
+* **config:** integrate cmd/config with internal/config and add list command ([09dc33f](https://github.com/snowdreamtech/UniGo/commit/09dc33f4e87c7f3a23f7da0a0ecafce17c0f39f9))
+* **core:** declare concrete base struct types for sysinfo, transaction, and disk utils ([05c68e0](https://github.com/snowdreamtech/UniGo/commit/05c68e09f4a129fb1603bb90f31e5e061e33a9e4))
+* **core:** use internal/errors, internal/logger and declare concrete base types across internal packages ([e3216ea](https://github.com/snowdreamtech/UniGo/commit/e3216eacae03056dbe8f8191ec8a63256568082a))
+* **env:** eliminate modulo bias in RandomString via rejection sampling ([ec001c6](https://github.com/snowdreamtech/UniGo/commit/ec001c6486853205441343f45e15ae8a79311a1a))
+* **release:** align project description and metadata to unigo in goreleaser config ([1ff1c42](https://github.com/snowdreamtech/UniGo/commit/1ff1c42139979e938efe7c2e7396fa9172c546ee))
+* **release:** standardize release asset naming conventions ([06c0842](https://github.com/snowdreamtech/UniGo/commit/06c084256cc68a7fe47dcefec72c0a4c10ff011c))
+
+
+### 📖 Documentation
+
+* **adr:** record ADR 0004 for credential storage and secrets management strategy ([be871dc](https://github.com/snowdreamtech/UniGo/commit/be871dccc2925245429ce328c1427d4bb8d9388f))
+* **agent:** sync storage and low-level hardware safety rules ([c60cfe5](https://github.com/snowdreamtech/UniGo/commit/c60cfe55f17482ce61c371427d8a04edf07a4765))
+
+
+### ♻️ Miscellaneous Chores
+
+* **deps:** bump mermaid in /docs in the all-dependencies group ([060979a](https://github.com/snowdreamtech/UniGo/commit/060979a73ff38e703afcf75ab98c64d51b595e64))
+* **deps:** merge upstream/dev into dev ([5a743a7](https://github.com/snowdreamtech/UniGo/commit/5a743a72f82a6c56c11aeed1ca010b6b9491cb8d))
+* **deps:** migrate unirtm.lock keys to canonical prefixed format ([16421b7](https://github.com/snowdreamtech/UniGo/commit/16421b7ed716746da0be4e147bed5ab75f77045d))
+* **deps:** sync dependabot config and unirtm toolchain ([f1d270b](https://github.com/snowdreamtech/UniGo/commit/f1d270bef229edce2c43571740b58a776638d0b2))
+* **deps:** sync dependabot config and unirtm toolchain ([0aa215f](https://github.com/snowdreamtech/UniGo/commit/0aa215fa22b756319fed20bc461f15eb0dbe683e))
+* **deps:** sync dependabot config and unirtm toolchain ([fe2d7b6](https://github.com/snowdreamtech/UniGo/commit/fe2d7b6c47fc229fc038b80068299478f3fa2f08))
+* **deps:** sync dependabot config and unirtm toolchain ([ad9a33f](https://github.com/snowdreamtech/UniGo/commit/ad9a33fd63be54d1d5dd4cd92d256a164ad9c19d))
+* **deps:** sync dependabot config and unirtm toolchain ([6fca13d](https://github.com/snowdreamtech/UniGo/commit/6fca13d05ee9bd5a1cbdde2019fcef2cf4ceaa88))
+* **deps:** sync dependabot config and unirtm toolchain ([d908c5b](https://github.com/snowdreamtech/UniGo/commit/d908c5b7fdaf77401564dbf1af2e207a4b262752))
+* **deps:** sync dependabot config and unirtm toolchain ([d7023c0](https://github.com/snowdreamtech/UniGo/commit/d7023c0be316486305fce889c7b004b20ad7c275))
+* **deps:** update unirtm toolchain version to 0.30.0 ([2334d08](https://github.com/snowdreamtech/UniGo/commit/2334d088055136020e9a3c176d338c8185cb9ac0))
+* **deps:** upgrade unirtm-version to 0.30.1 ([87148d3](https://github.com/snowdreamtech/UniGo/commit/87148d3c7b1f17d59f660ba3b9aba1ab944f4f27))
+* **deps:** upgrade unirtm-version to 0.31.0 ([883b51e](https://github.com/snowdreamtech/UniGo/commit/883b51e6ca6902771f0340bd871c600317bcc22d))
+* **deps:** upgrade unirtm-version to 0.31.1 ([154816a](https://github.com/snowdreamtech/UniGo/commit/154816a94e4aaeeec926fc990bdcc6fb2d9458c4))
+* **go:** align go version to 1.27.1, enable auto gotoolchain, and update golangci-lint path ([40381ee](https://github.com/snowdreamtech/UniGo/commit/40381eeb44380cd930a7292765d8c63cd3c700b6))
+* **lint:** exclude specify scripts in editorconfig-checker ([fe3f871](https://github.com/snowdreamtech/UniGo/commit/fe3f87185f8f1b6bd3bd4814fdfdfc215f40430e))
+* merge upstream/dev into dev ([bd43212](https://github.com/snowdreamtech/UniGo/commit/bd43212eb399fcb099208200dd259d2e62dd67f9))
+* **pre-commit:** exclude logger test fixture from detect-private-key ([179139d](https://github.com/snowdreamtech/UniGo/commit/179139d45764f45f9c316349d2f403ccbdd4a061))
+* release main ([9671f29](https://github.com/snowdreamtech/UniGo/commit/9671f29e05dabcef89fe40a2566973b1daddc348))
+* release main ([3ce846e](https://github.com/snowdreamtech/UniGo/commit/3ce846eda8539f7ccdc46fd21f0d59a1b59537dd))
+* release main ([#179](https://github.com/snowdreamtech/UniGo/issues/179)) ([5abb138](https://github.com/snowdreamtech/UniGo/commit/5abb138b8facdbef67eb206af1604e8e453c2660))
+* **security:** ignore unused crypto ssh DoS vulnerabilities in osv-scanner ([43d0bf3](https://github.com/snowdreamtech/UniGo/commit/43d0bf3883dc7854e278cadaf31a15d09b5a38fc))
+
 ## [0.2.0](https://github.com/snowdreamtech/UniGo/compare/v0.1.1...v0.2.0) (2026-09-05)
 
 
