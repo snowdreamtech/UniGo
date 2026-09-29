@@ -747,3 +747,4 @@ sbom.json
 completions/
 manpages/
 unigo
+.trivycache/

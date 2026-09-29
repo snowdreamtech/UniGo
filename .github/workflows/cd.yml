@@ -69,6 +69,15 @@ jobs:
         run: |
           unirtm exec -- commitlint --last --verbose
 
+      - name: "⚡ Cache Trivy Database"
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .trivycache
+          key: ${{ runner.os }}-trivy-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-trivy-
+
       - name: "🧪 Execute Full Quality & Safety Verification"
         shell: sh
         run: |
@@ -77,6 +86,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PYTHONUTF8: 1
           TRIVY_CACHE_DIR: .trivycache
+          TRIVY_DB_REPOSITORY: "ghcr.io/aquasecurity/trivy-db:2,public.ecr.aws/aquasecurity/trivy-db:2"
+          TRIVY_JAVA_DB_REPOSITORY: "ghcr.io/aquasecurity/trivy-java-db:1,public.ecr.aws/aquasecurity/trivy-java-db:1"
+          TRIVY_CHECKS_BUNDLE_REPOSITORY: "ghcr.io/aquasecurity/trivy-checks:2,public.ecr.aws/aquasecurity/trivy-checks:2"
           UNIRTM_YES: 1
 
       #       - name: "🧪 Execute Shell Tests (Bats)"
@@ -121,8 +133,11 @@ jobs:
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         if: ${{ always() && matrix.os == 'ubuntu-latest' }}
         env:
-          TRIVY_DB_REPOSITORY: "public.ecr.aws/aquasecurity/trivy-db"
-          TRIVY_CHECKS_BUNDLE_REPOSITORY: "public.ecr.aws/aquasecurity/trivy-checks"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TRIVY_CACHE_DIR: .trivycache
+          TRIVY_DB_REPOSITORY: "ghcr.io/aquasecurity/trivy-db:2,public.ecr.aws/aquasecurity/trivy-db:2"
+          TRIVY_JAVA_DB_REPOSITORY: "ghcr.io/aquasecurity/trivy-java-db:1,public.ecr.aws/aquasecurity/trivy-java-db:1"
+          TRIVY_CHECKS_BUNDLE_REPOSITORY: "ghcr.io/aquasecurity/trivy-checks:2,public.ecr.aws/aquasecurity/trivy-checks:2"
         with:
           scan-type: "fs"
           ignore-unfixed: true
