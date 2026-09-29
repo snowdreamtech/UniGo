@@ -53,11 +53,12 @@ func Load() (*Config, error) {
 	return cfg, nil
 }
 
-// Save writes the current configuration to unigo.toml in the global config directory.
+// Save writes the current configuration to unigo.toml in the global config directory atomically.
 func (c *Config) Save() error {
 	configPath := env.GetGlobalConfigPath() // Defaults to unigo.toml
 
-	if err := os.MkdirAll(filepath.Dir(configPath), 0755); err != nil {
+	dir := filepath.Dir(configPath)
+	if err := os.MkdirAll(dir, 0755); err != nil {
 		return fmt.Errorf("failed to create config directory: %w", err)
 	}
 
@@ -66,8 +67,36 @@ func (c *Config) Save() error {
 		return fmt.Errorf("failed to marshal config: %w", err)
 	}
 
-	if err := os.WriteFile(configPath, data, 0600); err != nil {
-		return fmt.Errorf("failed to write config file: %w", err)
+	tmpFile, err := os.CreateTemp(dir, "unigo-config-*.tmp")
+	if err != nil {
+		return fmt.Errorf("failed to create temporary config file: %w", err)
+	}
+	tmpName := tmpFile.Name()
+	defer func() {
+		_ = os.Remove(tmpName)
+	}()
+
+	if err := tmpFile.Chmod(0600); err != nil {
+		_ = tmpFile.Close()
+		return fmt.Errorf("failed to chmod temporary config file: %w", err)
+	}
+
+	if _, err := tmpFile.Write(data); err != nil {
+		_ = tmpFile.Close()
+		return fmt.Errorf("failed to write temporary config file: %w", err)
+	}
+
+	if err := tmpFile.Sync(); err != nil {
+		_ = tmpFile.Close()
+		return fmt.Errorf("failed to sync temporary config file: %w", err)
+	}
+
+	if err := tmpFile.Close(); err != nil {
+		return fmt.Errorf("failed to close temporary config file: %w", err)
+	}
+
+	if err := os.Rename(tmpName, configPath); err != nil {
+		return fmt.Errorf("failed to atomically replace config file: %w", err)
 	}
 
 	return nil

@@ -153,19 +153,26 @@ func TestSaveMkdirError(t *testing.T) {
 }
 
 func TestSaveWriteError(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Windows does not support Unix-style directory permissions for testing read-only directories")
+	}
 	tmpDir, _ := os.MkdirTemp("", "unigo_config_test")
-	defer os.RemoveAll(tmpDir)
+	defer func() {
+		_ = os.Chmod(tmpDir, 0755)
+		_ = os.RemoveAll(tmpDir)
+	}()
 	os.Setenv("UNIGO_CONFIG_DIR", tmpDir)
 	defer os.Unsetenv("UNIGO_CONFIG_DIR")
 
-	// Pre-create the config file as read-only
-	configPath := filepath.Join(tmpDir, "unigo.toml")
-	os.WriteFile(configPath, []byte(""), 0400)
+	// Pre-create read-only directory so CreateTemp fails
+	if err := os.Chmod(tmpDir, 0500); err != nil {
+		t.Fatalf("Failed to chmod directory: %v", err)
+	}
 
 	cfg := &Config{Debug: true}
 	err := cfg.Save()
 	if err == nil {
-		t.Errorf("Expected error when WriteFile fails")
+		t.Errorf("Expected error when config directory is read-only")
 	}
 }
 
