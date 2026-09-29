@@ -47,7 +47,7 @@ UNIRTM_HOOK_ALLOW_MISSING = "1"
 "github:zizmorcore/zizmor" = "1.30.1"
 "github:goreleaser/goreleaser" = "2.18.2"
 go = "1.27.1"
-node = "26.8.1"
+node = "20.18.3"
 "npm:@commitlint/cli" = "21.2.3"
 "npm:@commitlint/config-conventional" = "21.2.3"
 "npm:@taplo/cli" = "0.7.0"
@@ -218,8 +218,7 @@ description = "Run Go unit tests for all packages recursively"
 # -p 4         : limit the number of packages compiled/tested in parallel to prevent CI OOM
 #                (GitHub Actions ubuntu-latest has ~7GB RAM; -race multiplies usage 5-10x)
 # CGO_ENABLED=0: force pure-Go build — all test files must use modernc.org/sqlite, not mattn/go-sqlite3
-# run = 'unirtm exec -- go test -cover -v -timeout 10m -p 4 ./...'
-run = "unirtm exec -- unirtm version"
+run = "unirtm exec -- go test -cover -v -timeout 10m -p 4 ./..."
 output = "interleaved"
 env = { GOTOOLCHAIN = 'auto', CGO_ENABLED = '0' }
 
