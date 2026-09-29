@@ -115,15 +115,31 @@ var (
 	CryptoRandRead = rand.Read
 )
 
-// RandomString returns a random string of the specified length.
+// RandomString returns a cryptographically secure random alphanumeric string of the specified length without modulo bias.
 func RandomString(n int) (string, error) {
+	if n <= 0 {
+		return "", nil
+	}
 	const letters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	bytes := make([]byte, n)
-	if _, err := CryptoRandRead(bytes); err != nil {
-		return "", err
+	const maxValidByte = 256 - (256 % len(letters)) // 248, evenly divisible by 62
+
+	result := make([]byte, n)
+	buf := make([]byte, n+(n/4)+4)
+	idx := 0
+
+	for idx < n {
+		if _, err := CryptoRandRead(buf); err != nil {
+			return "", err
+		}
+		for _, b := range buf {
+			if int(b) < maxValidByte {
+				result[idx] = letters[int(b)%len(letters)]
+				idx++
+				if idx == n {
+					break
+				}
+			}
+		}
 	}
-	for i, b := range bytes {
-		bytes[i] = letters[b%byte(len(letters))]
-	}
-	return string(bytes), nil
+	return string(result), nil
 }
