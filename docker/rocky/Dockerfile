@@ -6,7 +6,8 @@ ARG TARGETARCH
 # Set the workdir
 WORKDIR /root/go/src/github.com/snowdreamtech/unigo
 
-ENV GO111MODULE=auto
+ENV GO111MODULE=auto \
+    GOTOOLCHAIN=auto
 
 COPY . ./
 
