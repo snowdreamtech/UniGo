@@ -73,10 +73,9 @@ archives:
     # This name template makes the OS and Arch compatible with uname and includes the version.
     name_template: >-
       {{- .ProjectName }}_
-      {{- title .Os }}_
-      {{- if eq .Arch "amd64" }}x86_64
-      {{- else if eq .Arch "386" }}i386
-      {{- else }}{{ .Arch }}{{ end }}
+      {{- .Version }}_
+      {{- .Os }}_
+      {{- .Arch }}
       {{- if .Arm }}v{{ .Arm }}{{ end -}}
     # Wraps the files inside a top-level directory within the archive to prevent tarbombing (Best Practice)
     wrap_in_directory: true
@@ -298,7 +297,6 @@ homebrew_casks:
     homepage: "https://github.com/snowdreamtech/unigo"
     url:
       template: "https://github.com/snowdreamtech/unigo/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-      verified: "github.com/snowdreamtech/"
     description: "Snowdream Tech AI IDE Template is an enterprise-grade, foundational template designed for multi-AI IDE collaboration."
     license: "MIT"
     hooks:
