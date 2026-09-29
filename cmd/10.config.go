@@ -4,13 +4,12 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
-	"path/filepath"
+	"strconv"
+	"strings"
 
 	"github.com/pterm/pterm"
-	"github.com/snowdreamtech/unigo/internal/env"
+	"github.com/snowdreamtech/unigo/internal/config"
 	"github.com/snowdreamtech/unigo/internal/logger"
 	"github.com/spf13/cobra"
 )
@@ -20,42 +19,36 @@ func init() {
 		rootCmd.AddCommand(configCmd)
 		configCmd.AddCommand(configGetCmd)
 		configCmd.AddCommand(configSetCmd)
+		configCmd.AddCommand(configListCmd)
 	}
-}
-
-func getConfigPath() string {
-	return filepath.Join(env.GetConfigDir(), "config.json")
-}
-
-func loadConfig() map[string]string {
-	path := getConfigPath()
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return make(map[string]string)
-	}
-	var conf map[string]string
-	if err := json.Unmarshal(data, &conf); err != nil {
-		return make(map[string]string)
-	}
-	return conf
-}
-
-func saveConfig(conf map[string]string) error {
-	path := getConfigPath()
-	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
-		return err
-	}
-	data, err := json.MarshalIndent(conf, "", "  ")
-	if err != nil {
-		return err
-	}
-	return os.WriteFile(path, data, 0600)
 }
 
 var configCmd = &cobra.Command{
 	Use:   "config",
 	Short: "Manage configuration",
-	Long:  "Query or modify the configuration settings.",
+	Long:  "Query or modify the UniGo configuration settings stored in unigo.toml.",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return configListCmd.RunE(cmd, args)
+	},
+}
+
+var configListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List all configuration values",
+	Args:  cobra.NoArgs,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		cfg, err := config.Load()
+		if err != nil {
+			return fmt.Errorf("failed to load configuration: %w", err)
+		}
+
+		tableData := [][]string{
+			{"KEY", "VALUE"},
+			{"debug", strconv.FormatBool(cfg.Debug)},
+		}
+
+		return pterm.DefaultTable.WithHasHeader().WithData(tableData).Render()
+	},
 }
 
 var configGetCmd = &cobra.Command{
@@ -63,13 +56,18 @@ var configGetCmd = &cobra.Command{
 	Short: "Get a configuration value",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		key := args[0]
+		key := strings.ToLower(args[0])
 		logger.Debug("Getting config value", "key", key)
 
-		conf := loadConfig()
-		if val, ok := conf[key]; ok {
-			fmt.Println(val)
-		} else {
+		cfg, err := config.Load()
+		if err != nil {
+			return fmt.Errorf("failed to load configuration: %w", err)
+		}
+
+		switch key {
+		case "debug":
+			fmt.Println(cfg.Debug)
+		default:
 			pterm.Warning.Printf("Key '%s' not found in configuration\n", key)
 		}
 		return nil
@@ -81,13 +79,27 @@ var configSetCmd = &cobra.Command{
 	Short: "Set a configuration value",
 	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		key := args[0]
+		key := strings.ToLower(args[0])
 		val := args[1]
 		logger.Debug("Setting config value", "key", key, "value", val)
 
-		conf := loadConfig()
-		conf[key] = val
-		if err := saveConfig(conf); err != nil {
+		cfg, err := config.Load()
+		if err != nil {
+			return fmt.Errorf("failed to load configuration: %w", err)
+		}
+
+		switch key {
+		case "debug":
+			b, err := strconv.ParseBool(val)
+			if err != nil {
+				return fmt.Errorf("invalid boolean value for debug: %w", err)
+			}
+			cfg.Debug = b
+		default:
+			return fmt.Errorf("unsupported configuration key '%s'", key)
+		}
+
+		if err := cfg.Save(); err != nil {
 			pterm.Error.Printf("Failed to save configuration: %v\n", err)
 			return err
 		}
