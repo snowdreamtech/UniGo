@@ -1269,6 +1269,26 @@ backend = "npm"
 
 [tools."npm:stylelint"."platforms.windows-arm64"]
 
+[[tools."npm:stylelint"]]
+version = "17.16.0"
+backend = "npm"
+
+[tools."npm:stylelint"."platforms.linux-amd64"]
+
+[tools."npm:stylelint"."platforms.linux-amd64-musl"]
+
+[tools."npm:stylelint"."platforms.linux-arm64"]
+
+[tools."npm:stylelint"."platforms.linux-arm64-musl"]
+
+[tools."npm:stylelint"."platforms.macos-amd64"]
+
+[tools."npm:stylelint"."platforms.macos-arm64"]
+
+[tools."npm:stylelint"."platforms.windows-amd64"]
+
+[tools."npm:stylelint"."platforms.windows-arm64"]
+
 [[tools."pipx:clang-format"]]
 version = "23.1.0"
 backend = "pipx"
@@ -1291,6 +1311,26 @@ backend = "pipx"
 
 [[tools."pipx:clang-format"]]
 version = "23.1.1"
+backend = "pipx"
+
+[tools."pipx:clang-format"."platforms.linux-amd64"]
+
+[tools."pipx:clang-format"."platforms.linux-amd64-musl"]
+
+[tools."pipx:clang-format"."platforms.linux-arm64"]
+
+[tools."pipx:clang-format"."platforms.linux-arm64-musl"]
+
+[tools."pipx:clang-format"."platforms.macos-amd64"]
+
+[tools."pipx:clang-format"."platforms.macos-arm64"]
+
+[tools."pipx:clang-format"."platforms.windows-amd64"]
+
+[tools."pipx:clang-format"."platforms.windows-arm64"]
+
+[[tools."pipx:clang-format"]]
+version = "23.1.2"
 backend = "pipx"
 
 [tools."pipx:clang-format"."platforms.linux-amd64"]
@@ -1374,25 +1414,25 @@ version = "3.14.7"
 backend = "native"
 
 [tools."python"."platforms.linux-amd64"]
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260924/cpython-3.14.7%2B20260924-x86_64-unknown-linux-gnu-debug-full.tar.zst"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260929/cpython-3.14.7%2B20260929-x86_64-unknown-linux-gnu-debug-full.tar.zst"
 
 [tools."python"."platforms.linux-amd64-musl"]
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260924/cpython-3.14.7%2B20260924-x86_64-unknown-linux-gnu-debug-full.tar.zst"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260929/cpython-3.14.7%2B20260929-x86_64-unknown-linux-gnu-debug-full.tar.zst"
 
 [tools."python"."platforms.linux-arm64"]
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260924/cpython-3.14.7%2B20260924-aarch64-unknown-linux-gnu-debug-full.tar.zst"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260929/cpython-3.14.7%2B20260929-aarch64-unknown-linux-gnu-debug-full.tar.zst"
 
 [tools."python"."platforms.linux-arm64-musl"]
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260924/cpython-3.14.7%2B20260924-aarch64-unknown-linux-gnu-debug-full.tar.zst"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260929/cpython-3.14.7%2B20260929-aarch64-unknown-linux-gnu-debug-full.tar.zst"
 
 [tools."python"."platforms.macos-amd64"]
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260924/cpython-3.14.7%2B20260924-x86_64-apple-darwin-debug-full.tar.zst"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260929/cpython-3.14.7%2B20260929-x86_64-apple-darwin-debug-full.tar.zst"
 
 [tools."python"."platforms.macos-arm64"]
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260924/cpython-3.14.7%2B20260924-aarch64-apple-darwin-debug-full.tar.zst"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260929/cpython-3.14.7%2B20260929-aarch64-apple-darwin-debug-full.tar.zst"
 
 [tools."python"."platforms.windows-amd64"]
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260924/cpython-3.14.7%2B20260924-x86_64-pc-windows-msvc-debug-full.tar.zst"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260929/cpython-3.14.7%2B20260929-x86_64-pc-windows-msvc-debug-full.tar.zst"
 
 [tools."python"."platforms.windows-arm64"]
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260924/cpython-3.14.7%2B20260924-aarch64-pc-windows-msvc-debug-full.tar.zst"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260929/cpython-3.14.7%2B20260929-aarch64-pc-windows-msvc-debug-full.tar.zst"
