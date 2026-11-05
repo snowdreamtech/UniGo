@@ -97,6 +97,7 @@ url = "https://github.com/astral-sh/ruff/releases/download/0.17.3/ruff-x86_64-pc
 
 [tools."github:astral-sh/ruff"."platforms.windows-arm64"]
 url = "https://github.com/astral-sh/ruff/releases/download/0.17.3/ruff-aarch64-pc-windows-msvc.zip"
+
 [[tools."github:cli/cli"]]
 version = "2.103.3"
 backend = "github"
@@ -481,6 +482,7 @@ backend = "go-pkg"
 [tools."go:golang.org/x/vuln/cmd/govulncheck"."platforms.windows-amd64"]
 
 [tools."go:golang.org/x/vuln/cmd/govulncheck"."platforms.windows-arm64"]
+
 [[tools."node"]]
 version = "26.8.1"
 backend = "native"
