@@ -97,7 +97,6 @@ url = "https://github.com/astral-sh/ruff/releases/download/0.17.3/ruff-x86_64-pc
 
 [tools."github:astral-sh/ruff"."platforms.windows-arm64"]
 url = "https://github.com/astral-sh/ruff/releases/download/0.17.3/ruff-aarch64-pc-windows-msvc.zip"
-
 [[tools."github:cli/cli"]]
 version = "2.103.3"
 backend = "github"
@@ -266,6 +265,34 @@ url = "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellche
 
 [tools."github:koalaman/shellcheck"."platforms.windows-amd64"]
 url = "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.zip"
+
+[[tools."github:mvdan/sh"]]
+version = "3.14.1"
+backend = "github"
+
+[tools."github:mvdan/sh"."platforms.linux-amd64"]
+url = "https://github.com/mvdan/sh/releases/download/v3.14.1/shfmt_v3.14.1_linux_amd64"
+
+[tools."github:mvdan/sh"."platforms.linux-amd64-musl"]
+url = "https://github.com/mvdan/sh/releases/download/v3.14.1/shfmt_v3.14.1_linux_amd64"
+
+[tools."github:mvdan/sh"."platforms.linux-arm64"]
+url = "https://github.com/mvdan/sh/releases/download/v3.14.1/shfmt_v3.14.1_linux_arm64"
+
+[tools."github:mvdan/sh"."platforms.linux-arm64-musl"]
+url = "https://github.com/mvdan/sh/releases/download/v3.14.1/shfmt_v3.14.1_linux_arm64"
+
+[tools."github:mvdan/sh"."platforms.macos-amd64"]
+url = "https://github.com/mvdan/sh/releases/download/v3.14.1/shfmt_v3.14.1_darwin_amd64"
+
+[tools."github:mvdan/sh"."platforms.macos-arm64"]
+url = "https://github.com/mvdan/sh/releases/download/v3.14.1/shfmt_v3.14.1_darwin_arm64"
+
+[tools."github:mvdan/sh"."platforms.windows-amd64"]
+url = "https://github.com/mvdan/sh/releases/download/v3.14.1/shfmt_v3.14.1_windows_amd64.exe"
+
+[tools."github:mvdan/sh"."platforms.windows-arm64"]
+url = "https://github.com/mvdan/sh/releases/download/v3.14.1/shfmt_v3.14.1_windows_amd64.exe"
 
 [[tools."github:rhysd/actionlint"]]
 version = "1.7.12"
@@ -454,27 +481,6 @@ backend = "go-pkg"
 [tools."go:golang.org/x/vuln/cmd/govulncheck"."platforms.windows-amd64"]
 
 [tools."go:golang.org/x/vuln/cmd/govulncheck"."platforms.windows-arm64"]
-
-[[tools."go:mvdan.cc/sh/v3/cmd/shfmt"]]
-version = "v3.14.0"
-backend = "go"
-
-[tools."go:mvdan.cc/sh/v3/cmd/shfmt"."platforms.linux-amd64"]
-
-[tools."go:mvdan.cc/sh/v3/cmd/shfmt"."platforms.linux-amd64-musl"]
-
-[tools."go:mvdan.cc/sh/v3/cmd/shfmt"."platforms.linux-arm64"]
-
-[tools."go:mvdan.cc/sh/v3/cmd/shfmt"."platforms.linux-arm64-musl"]
-
-[tools."go:mvdan.cc/sh/v3/cmd/shfmt"."platforms.macos-amd64"]
-
-[tools."go:mvdan.cc/sh/v3/cmd/shfmt"."platforms.macos-arm64"]
-
-[tools."go:mvdan.cc/sh/v3/cmd/shfmt"."platforms.windows-amd64"]
-
-[tools."go:mvdan.cc/sh/v3/cmd/shfmt"."platforms.windows-arm64"]
-
 [[tools."node"]]
 version = "26.8.1"
 backend = "native"
@@ -592,7 +598,7 @@ backend = "npm"
 [tools."npm:sort-package-json"."platforms.windows-arm64"]
 
 [[tools."npm:stylelint"]]
-version = "17.16.0"
+version = "18.0.0"
 backend = "npm"
 
 [tools."npm:stylelint"."platforms.linux-amd64"]
