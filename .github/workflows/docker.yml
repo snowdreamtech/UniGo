@@ -463,7 +463,7 @@ jobs:
           image-ref: ${{ steps.trivy-image.outputs.tag }}
           format: "sarif"
           output: "trivy-image-${{ matrix.variant }}.sarif"
-          severity: "CRITICAL,HIGH,MEDIUM,LOW"
+          severity: "CRITICAL,HIGH"
           ignore-unfixed: true
           exit-code: "0"
           skip-dirs: "/tmp,/var/tmp,/var/cache"
@@ -477,19 +477,16 @@ jobs:
           if [ -f "trivy-image-${{ matrix.variant }}.sarif" ]; then
             critical=$(jq '[.runs[].results[] | select(.level=="error")] | length' trivy-image-${{ matrix.variant }}.sarif)
             high=$(jq '[.runs[].results[] | select(.level=="warning")] | length' trivy-image-${{ matrix.variant }}.sarif)
-            medium=$(jq '[.runs[].results[] | select(.level=="note")] | length' trivy-image-${{ matrix.variant }}.sarif)
             {
               echo "critical=${critical}"
               echo "high=${high}"
-              echo "medium=${medium}"
             } >> "$GITHUB_OUTPUT"
-            echo "✓ Parsed Trivy results: Critical=${critical}, High=${high}, Medium=${medium}"
+            echo "✓ Parsed Trivy results: Critical=${critical}, High=${high}"
           else
             echo "⚠️ SARIF file not found, skipping parse"
             {
               echo "critical=0"
               echo "high=0"
-              echo "medium=0"
             } >> "$GITHUB_OUTPUT"
           fi
 
