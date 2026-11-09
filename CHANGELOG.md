@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.5.0](https://github.com/snowdreamtech/UniGo/compare/v0.4.0...v0.5.0) (2026-11-09)
+
+
+### 🚀 Features
+
+* align with template dev and retain python and golang toolchains ([8236880](https://github.com/snowdreamtech/UniGo/commit/82368805fb662ab53864f787121e6e3b56dddcd6))
+* **toolchain:** isolate heavy CI tools into .unirtm.ci.toml overlay ([f88d680](https://github.com/snowdreamtech/UniGo/commit/f88d680a0dd9873312c76ae07e441352ef91e08e))
+
+
+### 🐛 Bug Fixes
+
+* **deps:** bump github.com/klauspost/compress to 1.20.2 to fix GO-2026-6865 ([f6bf8bf](https://github.com/snowdreamtech/UniGo/commit/f6bf8bf0f6d75c6c4e87a7699e3120c510ea5c0f))
+* **devcontainer:** use posix if statement in logging functions to avoid SC2015 ([21d82d1](https://github.com/snowdreamtech/UniGo/commit/21d82d1bac8dde819ef1ba95b80747207bd1fb5f))
+
+
+### ♻️ Miscellaneous Chores
+
+* **deps:** pin dompurify to exact version ([c32cde7](https://github.com/snowdreamtech/UniGo/commit/c32cde7fafcdf22fb600a0799ef7088f52c1e240))
+* **deps:** sync dependabot config and unirtm toolchain ([00437ac](https://github.com/snowdreamtech/UniGo/commit/00437aca3e6af8e8a043d3d8103e908f554156f2))
+* **deps:** sync dependabot config and unirtm toolchain ([b670ccb](https://github.com/snowdreamtech/UniGo/commit/b670ccbd078a7f858c817905799cb43c1dd8eebd))
+* **deps:** sync dependabot config and unirtm toolchain ([e124d2e](https://github.com/snowdreamtech/UniGo/commit/e124d2eae5b0451d21787b4dfdc9bd7729e239e0))
+* release main ([e2927ee](https://github.com/snowdreamtech/UniGo/commit/e2927ee6b0186af23b32c5e683a9b3a6f1518b85))
+* remove template docs and cleanup configurations ([5684232](https://github.com/snowdreamtech/UniGo/commit/5684232d35c267771140efaa1993f268ddac85fb))
+* **toolchain:** clean up obsolete runtime environment variables and documentation references ([b3b6f1b](https://github.com/snowdreamtech/UniGo/commit/b3b6f1be9b820fa4f522cf86af71b721b3412803))
+* **toolchain:** remove unused golang runtime, linters, and migrate shfmt to github ([10188a0](https://github.com/snowdreamtech/UniGo/commit/10188a077477e79de264a16617f23c69107d0273))
+* **toolchain:** remove unused python runtime, tools, and configuration ([a4b63d4](https://github.com/snowdreamtech/UniGo/commit/a4b63d4103a59360856a2586bce2bbe52515db2f))
+* **toolchain:** specify alias shfmt for github:mvdan/sh in config ([aef9f07](https://github.com/snowdreamtech/UniGo/commit/aef9f074abaced3cc51063f4352df19aa6d03220))
+
 ## [0.4.0](https://github.com/snowdreamtech/UniGo/compare/v0.3.0...v0.4.0) (2026-11-02)
 
 

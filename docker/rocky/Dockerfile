@@ -20,7 +20,7 @@ FROM ghcr.io/snowdreamtech/rocky:10.2.0
 
 # Build-time Configuration
 # x-release-please-start-version
-ARG VERSION="0.4.0"
+ARG VERSION="0.5.0"
 # x-release-please-end
 
 ARG BUILDTIME \
