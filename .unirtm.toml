@@ -20,7 +20,7 @@ UNIRTM_HOOK_ALLOW_MISSING = "1"
 "github:mvdan/sh" = { version = "3.14.1", alias = "shfmt" }
 "github:rhysd/actionlint" = "1.7.12"
 "github:zizmorcore/zizmor" = "1.31.1"
-go = "1.27.3"
+go = "1.27.4"
 node = "26.8.1"
 "npm:@taplo/cli" = "0.7.0"
 "npm:eslint" = "10.14.0"
